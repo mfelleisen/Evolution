@@ -3,10 +3,12 @@
 
 The system has two entry points: 
 
- -- main: creates players and hands references to dealer;
- -- server: gathers connections from external players and hands appropriate proxy players to dealer.
+ -- xmain: creates n player objects and hands those to a dealer to play one complete game
+ -- xdist: launches one xserver and n client threads (via xclients) to run a game via TCP
+    -- xserver listens on localhost on some specifiable port for clients 
+    -- xclients spawns n client players that connect to a specified server via TCP
 
-The major systems components are: 
+The major system components are: 
 
  dealer: knows everything (or knows who knows)
     -- the deck of _cards_ 
@@ -17,7 +19,7 @@ The major systems components are:
           -- their position in the feeding order 
     and watches over adherence to rules (or has means to do so)
 
- iplayer: represents total knowledge about one external player 
+ internal player: represents total knowledge about one external player 
     -- the cards 
     -- the number of food tokens acquired 
     -- the constructed species 
@@ -25,11 +27,15 @@ The major systems components are:
    and it manages the communication between the dealer and the external player, 
     -- a reference to the external player 
 
- xplayer: represents the game strategy (AI) as developed by competing sw devs
+ external player: represents the game strategy (AI) as developed by competing sw devs
    and gets to know the public state of the game at appropriate points 
    -- current cards (set)
    -- species boards (sequence)
    -- amount of food collected 
+
+ next: is the ontology (level of language) that dealers and players use to communicate
+ internal-external: is the mechanism that dealers use to communicate with external players
+ 		    both sequential and "remote" players
 
  board: represents the knowledge about a species
     -- its traits
