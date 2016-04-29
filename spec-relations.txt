@@ -1,0 +1,67 @@
+
+===================================================================================================
+
+The system has two entry points: 
+
+ -- main: creates players and hands references to dealer;
+ -- server: gathers connections from external players and hands appropriate proxy players to dealer.
+
+The major systems components are: 
+
+ dealer: knows everything (or knows who knows)
+    -- the deck of _cards_ 
+    -- references to the _external players_
+    -- the food at the _watering hole_
+    -- all player's exact current state via _iplayer_ representations plus 
+          -- their position in the turn order 
+          -- their position in the feeding order 
+    and watches over adherence to rules (or has means to do so)
+
+ iplayer: represents total knowledge about one external player 
+    -- the cards 
+    -- the number of food tokens acquired 
+    -- the constructed species 
+       	   -- their ordering 
+   and it manages the communication between the dealer and the external player, 
+    -- a reference to the external player 
+
+ xplayer: represents the game strategy (AI) as developed by competing sw devs
+   and gets to know the public state of the game at appropriate points 
+   -- current cards (set)
+   -- species boards (sequence)
+   -- amount of food collected 
+
+ board: represents the knowledge about a species
+    -- its traits
+    -- body size 
+    -- its population 
+    -- its food 
+    -- the amount of fat food, if it has the fat-tissue trait 
+
+===================================================================================================
+
++--------+       sequence     +---------+  1             1 +---------+
+| dealer | -------***-------> | iplayer |  --------------> | xplayer |
++--------+                    +---------+                  +---------+
+ |  $                                |                          $
+ |  $                                |                          $
+ |  $                                +-----------+              $
+ |  $                                            |              $ (communication data)
+ |  $                            +------+        |              $ 
+ |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~ | next | ~~~~~~~|~~~~~~~~~~~~~~~~
+ |                               +------+        |
+ v       			 		 v
++-------+				+---------------+	 
+| deck  |---***---+			| species board |
++-------+         |			+---------------+	 
+		  v			  |        |
+	       +--------+		  |	   -- body size 
+	       | card   |		  *	   -- population 
+	       +--------+		  * set	   -- food 
+	        |      | 1		  * 	   -- fat food (if fat-tissue trait)
+          +-----+      +----------+	  |
+	  |	                  | 	  |
+	  v			  v 1	  v
+      +--------+                +----------+		
+      | food # |	        |  trait   |
+      +--------+	        +----------+

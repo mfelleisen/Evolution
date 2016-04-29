@@ -1,0 +1,29 @@
+#! /bin/sh
+#|
+exec racket -tm "$0" ${1+"$@"}
+|#
+#lang racket
+
+;; ===================================================================================================
+;; runs a complete distrbuted game with n players on localhost port 56789, compare with
+;;   $ ./xmain n
+
+(require (only-in "dealer.rkt" MAX-PLAYERS MIN-PLAYERS))
+
+(provide
+  (contract-out
+    [main (-> (and/c string->number
+		     (compose (<=/c MAX-PLAYERS) string->number)
+		     (compose (<=/c MIN-PLAYERS) string->number))
+	      any)]))
+
+;; ===================================================================================================
+(require (rename-in "xserver" [main server])
+         (rename-in "xclients" [main clients]))
+
+;; ===================================================================================================
+(define (main n-string)
+  (define s (thread (lambda () (server "56789"))))
+  (with-output-to-string (lambda () (clients n-string "" "localhost" "56789")))
+  (sync s)
+  (exit 0))

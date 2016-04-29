@@ -1,0 +1,27 @@
+#! /bin/sh
+#|
+exec racket -tm "$0" ${1+"$@"}
+|#
+#lang racket
+
+;; ===================================================================================================
+;; runs a complete sequential game with n players on localhost port 56789, compare with
+;;   $ ./xdist n
+
+(provide
+  ;; StringN -> Void
+  ;; accept a number beween MIN-PLAYERS and MAX-PLAYERS
+  main)
+
+;; ===================================================================================================
+(require "dealer.rkt" "player-external.rkt" "../common.rkt")
+
+;; ===================================================================================================
+(define (main n-string (name number->string))
+  (define n (string->number n-string))
+  (unless (and n (<= MIN-PLAYERS n MAX-PLAYERS))
+    (printf "usage `main.rkt n' for some n between ~a and ~a\n" MIN-PLAYERS MAX-PLAYERS)
+    (exit -1))
+  (define players (build-list n (lambda (i) (list (name i) (create-external)))))
+  (define dealer  (create-dealer players))
+  (send dealer run-game))

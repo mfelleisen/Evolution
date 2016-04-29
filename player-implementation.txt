@@ -1,0 +1,48 @@
+#lang racket
+
+#| ---------------------------------------------------------------------------------------------------
+   composite pattern for player implementations
+       
+                                 +----------------------+                   +----------------------+
+                                 |     basic-player%    |--- implements --> |      equal<%>        | 
+                                 +----------------------+                   +----------------------+
+                                 | store-fat            |
+                                 | separate-hungries    |
+                                 | with-fat-tissue      |
+                                 | hungry               |
+                                 | can-attack           |
+                                 | can-attack+          |
+                                 +----------------------+
+                                          ^
+                                          |
+             -----------------------------+-----------------------------
+             |                                                         |
+  +----------------------+                                   +----------------------+
+  |        player%       |              +------------------> |   external-player%   |---satisfies---+
+  +----------------------+              |                    +----------------------+               |
+  | id, external         |---- has -----+                    |  start               |               |
+  +----------------------+                                   |  choose              |               |
+  | start                |                                   |  feed-next           |               |
+  | choose               |                                   +----------------------+               |
+  | feed-next            |                                      * = (>= (length cards) CARDS-BEFORE-CHOOSE)
+  +----------------------+                                   +----------------------+               |
+  | add-board*           |                                   | (external-player/c *)| <-------------+
+  | replace-trait        |                                   +----------------------+               |
+  | grow-body*           |                                                                          |
+  | grow-population*     |                                                                          |
+  | card                 |                                      * = true                            | 
+  | remove-cards         |                                   +----------------------+               |
+  | all-fed              |                                   |   proxy-player%      | <------------ +
+  | feedable             |                                   +----------------------+
+  | feed1                |                                   |  start               |
+  | attack!              |                                   |  choose              |
+  | population+1         |                                   |  feed-next           |
+  | kill1                |                                   +----------------------+
+  | add-board-if-needed  |
+  | take-cards           |
+  | how-many-cards-needed|
+  | move-food-to-bag     |
+  | score                |
+  +----------------------+                                   
+
+--------------------------------------------------------------------------------------------------- |#

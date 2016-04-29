@@ -1,0 +1,99 @@
+#! /bin/sh
+#|
+exec racket -W info -tm "$0" ${1+"$@"}
+|#
+#lang racket
+
+;; ===================================================================================================
+;; a server for an Evolution game
+
+(require (only-in "basics.rkt" valid-port/c))
+
+(define WAIT-FOR 10)
+
+(provide
+ (contract-out
+  ;; ./proxy-server.rkt REMOTE [keep-alive]
+  ;; EFFECT accept connections on the listener at REMOTE until
+  ;; -- there are at least MIN-PLAYERS
+  ;; and
+  ;; -- the next one takes too long to connect (WAIT-FOR) or
+  ;; -- MAX-PLAYERS signed up. 
+  ;; EFFECT when the process times out or there are enough players, run a game of Evolution
+  ;; repeat, if the keep-alive (any string) is available 
+  [main (->* [] [(and/c string->number valid-port/c) string?] any)]))
+
+;; ===================================================================================================
+(require "gui.rkt" "dealer.rkt" "proxy-player.rkt" "../common.rkt" json)
+
+(module+ test
+  (require [rename-in "proxy-client.rkt" [main create-client]]
+           [rename-in "xmain" [main sequential]] rackunit))
+
+;; ===================================================================================================
+(define MAX-TCP  30)
+(define REOPEN   #t)
+
+(define (main [iport REMOTE-PORT][keep-alive? #f])
+  (define port (if (number? iport) iport (string->number iport)))
+  (let loop ()
+    (main-internal port)
+    (when keep-alive? (loop))))
+
+;; PortNumber -> Void 
+(define (main-internal [port REMOTE-PORT])
+  (define c (make-custodian))
+  (parameterize ((current-custodian c))
+    (define listener (tcp-listen port MAX-TCP REOPEN))
+    (let collect ([players '()])
+      (define players++ (add-player listener players))
+      (cond
+        [(< (length players++) MIN-PLAYERS) (collect players++)]
+        [else (collect+ listener players++)]))))
+
+;; Tcp-Listener [Listof ExternalPlayer] -> [Listof ExternalPlayer]
+;; add one player to the given list of players
+;; EFFECT accept a connection on the listener 
+(define (add-player listener players)
+  (define-values (in out) (tcp-accept listener))
+  (parameterize ((current-input-port in) (current-output-port out))
+    (define sign-up (read-message))
+    (log-info "contact made by ~a" (if (jsexpr? sign-up) (jsexpr->bytes sign-up) sign-up))
+    (if (and (string? sign-up) (send-message "ok"))
+        (cons (list sign-up (create-proxy-player in out)) players)
+        players)))
+
+;; Tcp-Listener [Listof ExternalPlayer | >= MIN-PLAYERS] -> Void
+;; EFFECT accept additional connections on the listener until
+;; -- the next one takes too long to connect or
+;; -- there are MAX-PLAYERS 
+;; EFFECT when the process times out or there are enough players, run a game of Evolution
+;; ASSUME collect+ is called with fewer than 
+(define (collect+ listener min-players)
+  (let collect+ ((players min-players) (count MIN-PLAYERS))
+    (cond
+      [(= count MAX-PLAYERS) (sign-up->start-up players)]
+      [(sync/timeout WAIT-FOR listener) (collect+ (add-player listener players) (+ count 1))]
+      [else (sign-up->start-up players)])))
+
+;; [Listof ExternalPlayer] -> Void
+;; EFFECT run a complete game of Evolution 
+(define (sign-up->start-up players)
+  (define n (length players))
+  (log-info "playing a game with ~a players" n)
+  (define dealer (create-dealer players))
+  (send dealer run-game)
+  (custodian-shutdown-all (current-custodian)))
+
+;; ===================================================================================================
+(module+ test
+  (define (tester n)
+    (define ch (make-channel))
+    (thread (lambda () (channel-put ch (with-output-to-string main-internal))))
+    (for ((i (in-range n)))
+      (thread (lambda () (create-client i))))
+    (define result (channel-get ch))
+    (define (name _) "my name is matthias")
+    (check-equal? result (with-output-to-string (lambda () (sequential (number->string n) name)))))
+  
+  (tester (random MIN-PLAYERS (+ MAX-PLAYERS 1))))

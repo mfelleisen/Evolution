@@ -1,0 +1,78 @@
+#! /bin/sh
+#|
+exec racket -W info -tm "$0" ${1+"$@"}
+|#
+#lang racket
+
+;; ===================================================================================================
+;; a module for spawning a bunch of client players 
+
+(require (only-in "basics.rkt" valid-port/c) (only-in "dealer.rkt" MAX-PLAYERS MIN-PLAYERS))
+
+(provide 
+ (contract-out
+  [main (->* [(and/c string->number (compose (<=/c MAX-PLAYERS) string->number))]
+             [string?
+              ;; the mandatory argument and the first optional argument
+              ;; must add up to at most MAX-PLAYERS
+              string?
+              (and/c string->number valid-port/c)]
+             any)]))
+
+;; ===================================================================================================
+(require (rename-in "proxy-client.rkt" [main create-client])
+         (except-in "basics.rkt" valid-port/c)
+         "../common.rkt")
+
+;; ===================================================================================================
+(define (main s0 (b0 "") (host LOCALHOST) (p0 REMOTE-PORT))
+  (define s (string->number s0))
+  (define p (if (number? p0) p0 (string->number p0)))
+  (define b (map string-trim (string-split b0 ",")))
+  (define length-b (length b))
+  ;; assert contracts 
+  (unless (<= MIN-PLAYERS (+ s length-b) MAX-PLAYERS)
+    (printf "usage: ./xclients n \"b1,b2,...,bk\" where ~a n+k <= ~a\n" MIN-PLAYERS MAX-PLAYERS)
+    (printf "given: ~e ~e \n" s b)
+    (exit -1))
+  
+  (define c (make-custodian))
+  
+  (parameterize ([current-custodian c])
+    (let/ec help 
+      (define goods
+        (for/list ((i (in-range s)))
+          (thread (lambda () (create-client (+ i length-b) host p)))))
+      (define bads
+        (for/list ((flavor b) (i (in-naturals)))
+          (define name-of-bad-guy
+            (case flavor
+              [("over")  (bad-over-growth i)]
+              [("no-fc") (bad-no-fc i)]
+              [("cinf")  (bad-choice-inf i)]
+              [("finf")  (bad-feed-inf i)]
+              [("feed")  (bad-feed-bad i)]
+              [("ill")   ill-formed]
+              [("infsu") infsu]
+              [("huge")  huge]
+              [("deep")  deep]
+              [else
+               (printf "possible bad clients are: \n")
+               (printf "  over\n")
+               (printf "  no-fc\n")
+               (printf "  cinf\n") 
+               (printf "  finf\n") 
+               (printf "  feed\n") 
+               (printf "  ill\n")  
+               (printf "  infsu\n")
+               (printf "  huge\n") 
+               (printf "  deep\n")
+               (help -1)]))
+          (thread
+           (lambda ()
+             (name-of-bad-guy i host p)))))
+      (define clients (append goods bads))
+      ;; if the clients time out too quickly, pass in a second argument [seconds]
+      (wait-for-all clients))
+    (custodian-shutdown-all c)
+    (displayln '(good bye))))
