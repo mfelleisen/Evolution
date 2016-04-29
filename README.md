@@ -7,6 +7,14 @@ The implementation supports both a sequential implementation that integrates Rac
 player implementations statically and a distributed implementation for interacting with
 players implemented in other languages.
 
+TOOD
+----
+
+1. clean up basic
+2. clean up common
+3. clean up add a description of communication between pieces 
+4. bring back gui in xserver 
+
 Files, Modules and Dependencies 
 -------------------------------
 
