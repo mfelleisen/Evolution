@@ -73,7 +73,7 @@
 (require (except-in "basics.rkt" maybe/c natural? natural+?))
 
 ;; for debugging
-(require  "../common.rkt")
+(require  "common.rkt")
 
 (module+ test
   (require rackunit))

@@ -8,13 +8,11 @@ exec racket -tm "$0" ${1+"$@"}
 ;; runs a complete distrbuted game with n players on localhost port 56789, compare with
 ;;   $ ./xmain n
 
-(require (only-in "dealer.rkt" MAX-PLAYERS MIN-PLAYERS))
+(require (only-in "dealer.rkt" MAX-PLAYERS MIN-PLAYERS) "basics.rkt")
 
 (provide
   (contract-out
-    [main (-> (and/c string->number
-		     (compose (<=/c MAX-PLAYERS) string->number)
-		     (compose (<=/c MIN-PLAYERS) string->number))
+    [main (-> (and/c string->number (compose (between/c MIN-PLAYERS MAX-PLAYERS) string->number))
 	      any)]))
 
 ;; ===================================================================================================

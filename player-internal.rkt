@@ -95,7 +95,7 @@
          2htdp/image)
 
 ;; for debugging
-(require "../common.rkt")
+(require "common.rkt")
 
 (module+ test
   (require rackunit))

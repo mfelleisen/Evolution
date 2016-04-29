@@ -46,7 +46,7 @@
          "board.rkt" "traits.rkt" 2htdp/image)
 
 ;; for debugging 
-(require "../common.rkt")
+(require "common.rkt")
 
 (module+ test
   (require rackunit
@@ -55,13 +55,13 @@
            (only-in (submod "player-internal.rkt" test) player)
            (submod ".."))
   (require (for-syntax syntax/parse))
-  (require (submod "../common.rkt" test)))
+  (require (submod "common.rkt" test)))
 
 ;; ===================================================================================================
 (define TITLE "Evolution: the dealer view")
 
 (define (create-dealer players)
-  (new dealer% [externals players][cards (shuffle all-cards)]))
+  (new dealer% [externals players][cards #;shuffle all-cards]))
 
 (define/contract (dealer #:cards [cards '()] 
                          #:players players

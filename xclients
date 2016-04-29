@@ -22,7 +22,7 @@ exec racket -W info -tm "$0" ${1+"$@"}
 ;; ===================================================================================================
 (require (rename-in "proxy-client.rkt" [main create-client])
          (except-in "basics.rkt" valid-port/c)
-         "../common.rkt")
+         "common.rkt")
 
 ;; ===================================================================================================
 (define (main s0 (b0 "") (host LOCALHOST) (p0 REMOTE-PORT))

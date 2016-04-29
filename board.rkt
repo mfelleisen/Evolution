@@ -96,12 +96,12 @@
 (require (except-in "traits.rkt" trait?) (except-in "basics.rkt" natural? between) 2htdp/image)
 
 ;; for debugging
-(require  "../common.rkt")
+(require  "common.rkt")
 
 (module+ test
   (require rackunit (submod ".."))
   
-  (require (submod "../common.rkt" test))
+  (require (submod "common.rkt" test))
   (write-out-tests #f)
   (testing (lambda (x y z w) (send x attackable? y z w))))
 

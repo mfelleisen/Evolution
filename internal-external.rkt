@@ -23,7 +23,7 @@
  client-error?)
 
 ;; =============================================================================
-(require "basics.rkt" "../common.rkt")
+(require "basics.rkt" "common.rkt")
 
 (module+ test
   (require rackunit))

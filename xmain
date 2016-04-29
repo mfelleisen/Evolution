@@ -14,7 +14,7 @@ exec racket -tm "$0" ${1+"$@"}
   main)
 
 ;; ===================================================================================================
-(require "dealer.rkt" "player-external.rkt" "../common.rkt")
+(require "dealer.rkt" "player-external.rkt" "common.rkt")
 
 ;; ===================================================================================================
 (define (main n-string (name number->string))

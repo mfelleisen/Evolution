@@ -55,11 +55,11 @@
          (except-in "cards.rkt" card?))
 
 ;; for debugging:
-(require "../common.rkt")
+(require "common.rkt")
 
 (module+ test
   (require rackunit (submod ".."))
-  (require (submod "../common.rkt" test) "../common.rkt"))
+  (require (submod "common.rkt" test) "common.rkt"))
 
 ;; ===================================================================================================
 (define (create-external)

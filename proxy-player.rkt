@@ -20,10 +20,10 @@
 (require "next.rkt" "internal-external.rkt"
          (except-in "cards.rkt" card?)
          "basics.rkt"
-         "../common.rkt" json)
+         "common.rkt" json)
 
 (module+ test
-  (require "board.rkt" "traits.rkt" (submod "..") (submod "../common.rkt" test) rackunit))
+  (require "board.rkt" "traits.rkt" (submod "..") (submod "common.rkt" test) rackunit))
 
 ;; ===================================================================================================
 

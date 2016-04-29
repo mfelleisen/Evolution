@@ -19,10 +19,10 @@
    (->* (input-port? output-port? external-player/c) (string?) dealer-external/c)]))
 
 ;; ===================================================================================================
-(require "board.rkt" "cards.rkt" "../common.rkt" "basics.rkt" json)
+(require "board.rkt" "cards.rkt" "common.rkt" "basics.rkt" json)
 
 (module+ test
-  (require "traits.rkt" (submod "..") (submod "../common.rkt" test) json rackunit))
+  (require "traits.rkt" (submod "..") (submod "common.rkt" test) json rackunit))
 
 ;; ===================================================================================================
 

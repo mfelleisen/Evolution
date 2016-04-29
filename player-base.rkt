@@ -29,7 +29,7 @@
          2htdp/image)
 
 ;; for debugging
-(require  "../common.rkt")
+(require  "common.rkt")
 
 ;; ===================================================================================================
 ;; the base class for players: every player must have these fields and methods 

@@ -24,7 +24,7 @@ exec racket -W info -tm "$0" ${1+"$@"}
   [main (->* [] [(and/c string->number valid-port/c) string?] any)]))
 
 ;; ===================================================================================================
-(require "gui.rkt" "dealer.rkt" "proxy-player.rkt" "../common.rkt" json)
+(require "gui.rkt" "dealer.rkt" "proxy-player.rkt" "common.rkt" json)
 
 (module+ test
   (require [rename-in "proxy-client.rkt" [main create-client]]
