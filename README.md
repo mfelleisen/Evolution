@@ -13,10 +13,10 @@ Files, Modules and Dependencies
 | name              | purpose                                                            |
 | ----------------- | ------------------------------------------------------------------ |
 |
-[spec-relations](https://github.com/mfelleisen/Courses/blob/master/16SwDev/Evolution/spec-relations.txt) | what kind of objects exist and how are they related and how they interact|
+[spec-relations](https://github.com/mfelleisen/Evolution/blob/master/spec-relations.txt) | what kind of objects exist and how are they related and how they interact|
 |           	    | 	     		       		     	  			 |
 | dealer	    | dealer data representation and functionality			 |
-| player-implementation.txt | a diagram ow how the following three files are related     |
+| [player-implementation.txt](https://github.com/mfelleisen/Evolution/blob/master/player-implementation.txt) | a diagram ow how the following three files are related     |
 | player-base       | basic player data and functionality				 |
 | player-external   | a representation of a specific "silly" external player		 |
 | player-internal   | a representation of the internal player with index-based API  	 |
