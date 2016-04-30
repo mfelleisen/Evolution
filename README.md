@@ -13,8 +13,8 @@ players implemented in other languages.
 For simple, deterministic runs, use xmain on the command line and supply a number
 between 3 and 8. 
 
-TOOD
-----
+TO DO
+-----
 
 1. clean up basic
 2. clean up common
