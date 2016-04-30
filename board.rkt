@@ -147,6 +147,9 @@
                             ("fat-food" ,(? nat? ff)))
      (species #:body b #:fat-food ff #:food f #:population p #:traits (map json->trait t))]))
 
+(define (nat? x)
+  (and (natural? x) (<= 0 x 7)))
+
 (define (json->species j)
   (json->opt-species j))
 

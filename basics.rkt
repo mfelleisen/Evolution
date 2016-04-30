@@ -4,57 +4,50 @@
   (require rackunit))
 
 ;; =============================================================================
-;; basic constants for rendering text 
+;; CONTRACTS 
 
-;; =============================================================================
 (provide
- ;; String [string->number?] -> Boolean : valid port number
- valid-port/c
-
- maybe/c
+ ;; N N -> [ [Listof X] -> Boolean ]
+ between
+ 
  ;; [Listof X] -> Boolean 
  unique/c
+ 
  ;; some basic predicates
- nat?
  natural+?
  natural?
  
  ;; [N N -> [ Any -> Boolean ]]
  ;; is x an n-tuple of natural numbers with at least min+1 and at most max+1 parts?
- NxN?)
+ NxN?
+ 
+ ;; Any -> Boolean
+ one?)
 
-;; -----------------------------------------------------------------------------
-
-(define (valid-port/c x0)
-  (define x (string->number x0))
-  (and (natural-number/c x) (<= x (expt 2 16))))
-
-(define (maybe/c c)
-  (or/c #false c))
+(define (between min max)
+  (define msg (format "list of ~a to ~a items" min max))
+  (flat-named-contract msg (lambda (l) (<= min (length l) max))))
 
 (define (unique/c l)
   (cond
     [(empty? l) #t]
     [else (and (not (member (first l) (rest l))) (unique/c (rest l)))]))
 
-(define (nat? x)
-  (and (integer? x) (<= 0 x 7)))
-
 (define (natural+? x)
   (and (integer? x) (<= 1 x)))
 
-(define (natural? x)
-  (and (integer? x) (<= 0 x)))
+(define natural? natural-number/c)
 
 (define ((NxN? min max) x)
   (match x
     [`(,(? natural? i) ,(? natural? j*) ...) (<= min (length j*) max)]
     [else #f]))
 
-;; =============================================================================
-;; anticipate module split here 
+(define (one? inputs)
+  (and (cons? inputs) (empty? (rest inputs))))
 
-;; dealing with json
+;; =============================================================================
+;; JSON
 
 (provide
  
@@ -71,7 +64,7 @@
     (list #t (convert x))))
 
 ;; =============================================================================
-;; anticipate module split here
+;; CONDITIONAL ACCESS AND SEND 
 
 (provide
  ;; [List X] -> [Maybe X]
@@ -80,31 +73,21 @@
  ;; [Maybe [NEListof Any]] -> [Maybe [Listof Any]]
  rest/c
  
- ;; [NEList X] -> [Maybe X]
- second/c
- 
  ;; [Vectorof X] Index -> [Maybe X]
  vector-ref/c
  
  ;; [Listof X] Index -> [Maybe X]
  list-ref/c
  
- ;; [NEListof X] -> [NEListof X]
- cyclic-rotate
- 
- ;; Any -> Boolean
- one?
- two?)
+ ;; SYNTAX
+ ;; (send/c t m o ...) is (send t m o ...) unless t is #false 
+ send/c)
 
-;; -----------------------------------------------------------------------------
 (define (first/c l)
   (if (empty? l) #f (first l)))
 
 (define (rest/c l)
   (if (cons? l) (rest l) #f))
-
-(define (second/c l)
-  (if (empty? (rest l)) #f (second l)))
 
 (define (vector-ref/c v i)
   (if (<= 0 i (- (vector-length v) 1)) (vector-ref v i) #f))
@@ -112,28 +95,18 @@
 (define (list-ref/c l i)
   (if (<= 0 i (- (length l) 1)) (list-ref l i) #f))
 
-(define (one? inputs)
-  (and (cons? inputs) (empty? (rest inputs))))
-
-(define (two? inputs)
-  (and (cons? inputs) (cons? (rest inputs)) (empty? (cddr inputs))))
-
-(define (cyclic-rotate players*)
-  (append (rest players*) (list (first players*))))
+(define-syntax-rule
+  (send/c t m o ...)
+  (if (boolean? t) #f (send t m o ...)))
 
 ;; =============================================================================
+;; some general basic functions 
+
 (provide
- ;; [Listof X] N -> [Listof X]
  (contract-out
+  ;; [Listof X] N -> [Listof X]
   ;; the given list has at least one X 
   [remove-i-th (-> cons? natural-number/c any)])
- 
- ;; [Listof X] [Listof X] -> Boolean
- suffix=?
- 
- ;; [Listof X] -> [Maybe [Setof X]]
- ;; ensure that the given list represents a set and convert it to a set
- to-set
  
  ;; [Listof N] [Listof X] -> [Listof X]
  ;; (remove-by-index (list i ... j) L) eliminates the i-th ... j-th item from L
@@ -143,7 +116,13 @@
  ;; (replace-by-index i x lox) replaces the i-th item of lox with x
  ;; no change of i is out of range 
  replace-by-index
- )
+
+ ;; [Listof X] -> [Maybe [Setof X]]
+ ;; ensure that the given list represents a set and convert it to a set
+ to-set
+ 
+ ;; [NEListof X] -> [NEListof X]
+ cyclic-rotate)
 
 (module+ test
   (check-equal? (remove-i-th '(x) 0) '())
@@ -156,25 +135,6 @@
       ;; for efficiency only: 
       (rest lox)
       (append (take lox i) (drop lox (+ i 1)))))
-
-(module+ test
-  (check-true (suffix=? '(a b c) '(a b c)))
-  (check-true (suffix=? '(b c) '(a b c)))
-  (check-true (suffix=? '((b) (c)) '((a) (b) (c))))
-  (check-false (suffix=? '(a b c d) '(a b c)))
-  (check-false (suffix=? '(b d) '(a b c))))
-
-(define (suffix=? a b)
-  (define al (length a))
-  (define bl (length b))
-  (cond
-    [(> al bl) #false]
-    [else (equal? (drop b (- bl al)) a)]))
-
-(define (to-set cards-in-play)
-  (define cards-as-set (apply set cards-in-play))
-  (and (= (length cards-in-play) (set-count cards-as-set))
-       cards-as-set))
 
 (module+ test
   (check-equal? (remove-by-index '() '(a b c)) '(a b c))
@@ -196,71 +156,10 @@
   (for/list ((x lox) (i (in-naturals)))
     (if (= i idx) nu x)))
 
+(define (to-set cards-in-play)
+  (define cards-as-set (apply set cards-in-play))
+  (and (= (length cards-in-play) (set-count cards-as-set))
+       cards-as-set))
 
-
-;; =============================================================================
-
-(provide
- ;; SYNTAX
- ;; (send/c t m o ...) is (send t m o ...) unless t is #false 
- send/c)
-
-(define-syntax-rule
-  (send/c t m o ...)
-  (if (boolean? t) #f (send t m o ...)))
-
-;; =============================================================================
-
-(provide
- 
- ;; N N -> [ [Listof X] -> Boolean ]
- between
- 
- ;; [Listof X] -> [ N -> Boolean] ]
- valid?
- 
- ;; SYNTAX
- ;; (define/checked-io name i-or-o contract name/pre) ensures that 
- define/checked-io
- in
- out)
-
-(define ((valid? cards) n)
-  (and (natural? n) (< n (length cards))))
-
-(define (between min max)
-  (define msg (format "list of ~a to ~a items" min max))
-  (flat-named-contract msg (lambda (l) (<= min (length l) max))))
-
-(define-syntax-rule 
-  (define/checked-io nm I/O ctc name/pre m ...)
-  (define nm
-    (let ((fmt (begin IO-CONTRACT m ...)))
-      (with-handlers ([exn:fail:contract?
-                       (lambda (x)
-                         (printf fmt 'nm I/O 'ctc)
-                         (newline)
-                         (raise x))])
-        (define/contract nm ctc name/pre)
-        nm))))
-
-(define-syntax out (syntax-id-rules () [_ 'OUT/c]))
-(define-syntax in (syntax-id-rules () [_ 'IN/c]))
-
-(define IO-CONTRACT "~a ~a does not satisfy its contract [~a]")
-
-;; =============================================================================
-;; sync-ing
-
-(provide 
-  ;; [Listof CML-Events] -> Void
-  ;; wait for all 'clients' to happen
-  wait-for-all)
-
-(define (wait-for-all clients (wait-time 10))
-  (when (and (> wait-time 0) (cons? clients))
-    (displayln `(waiting ,wait-time))
-    (define done (apply sync/timeout wait-time clients))
-    (if done 
-        (wait-for-all (remq done clients) wait-time)
-        (wait-for-all (remq done clients) (- wait-time 2)))))
+(define (cyclic-rotate players*)
+  (append (rest players*) (list (first players*))))

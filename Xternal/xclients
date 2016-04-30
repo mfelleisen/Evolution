@@ -9,7 +9,7 @@ exec racket -W info -tm "$0" ${1+"$@"}
 
 ;; EXTERNAL SERVICES
 
-(require (only-in "../basics.rkt" valid-port/c) (only-in "../dealer.rkt" MAX-PLAYERS MIN-PLAYERS))
+(require (only-in "../dealer.rkt" MAX-PLAYERS MIN-PLAYERS))
 
 (provide 
  (contract-out
@@ -18,15 +18,13 @@ exec racket -W info -tm "$0" ${1+"$@"}
               ;; the mandatory argument and the first optional argument
               ;; must add up to at most MAX-PLAYERS
               string?
-              (and/c string->number valid-port/c)]
+              (and/c string->number (compose port-number? string->number))]
              any)]))
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
 
-(require (rename-in "client.rkt" [main create-client])
-         (except-in "../basics.rkt" valid-port/c)
-         "../common.rkt")
+(require (rename-in "client.rkt" [main create-client]) "../common.rkt")
 
 ;; ===================================================================================================
 ;; IMPLEMENTATION
@@ -81,3 +79,13 @@ exec racket -W info -tm "$0" ${1+"$@"}
       (wait-for-all clients))
     (custodian-shutdown-all c)
     (displayln '(good bye))))
+
+;; [Listof CML-Events] -> Void
+;; wait for all 'clients' to happen
+(define (wait-for-all clients (wait-time 10))
+  (when (and (> wait-time 0) (cons? clients))
+    (displayln `(waiting ,wait-time))
+    (define done (apply sync/timeout wait-time clients))
+    (if done 
+        (wait-for-all (remq done clients) wait-time)
+        (wait-for-all (remq done clients) (- wait-time 2)))))

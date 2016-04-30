@@ -8,7 +8,8 @@
 (require (only-in "board.rkt" species/c)
          "internal-external.rkt"
           "cards.rkt"
-          (only-in "basics.rkt" maybe/c natural? natural+?))
+          (only-in "basics.rkt" natural? natural+?)
+	  unstable/contract)
 
 ;; --- choose card actions ---
 (define action4/c any/c)
@@ -121,7 +122,7 @@
 ;; ===================================================================================================
 ;; DEPENDENCIES
 
-(require (except-in "basics.rkt" maybe/c natural? natural+?))
+(require (except-in "basics.rkt" natural? natural+?))
 
 ;; for debugging
 (require  "common.rkt")

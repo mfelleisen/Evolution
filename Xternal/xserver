@@ -9,8 +9,6 @@ exec racket -W info -tm "$0" ${1+"$@"}
 
 ;; EXTERNAL SERVICES
 
-(require (only-in "../basics.rkt" valid-port/c))
-
 (define WAIT-FOR 10)
 
 (provide
@@ -23,7 +21,7 @@ exec racket -W info -tm "$0" ${1+"$@"}
   ;; -- MAX-PLAYERS signed up. 
   ;; EFFECT when the process times out or there are enough players, run a game of Evolution
   ;; repeat, if the keep-alive (any string) is available 
-  [main (->* [] [(and/c string->number valid-port/c) string?] any)]))
+  [main (->* [] [(and/c string->number (compose port-number? string->number)) string?] any)]))
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
