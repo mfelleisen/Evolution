@@ -29,23 +29,19 @@
 #| ---------------------------------------------------------------------------------------------------
    interpreter pattern for responses from feed-next
 
-					    +---------------------+
-					    |       next%         |
-					    +---------------------+
-					    | _public_            |
-					    | interpret           |
-					    | acceptable?         |
-					    | self-attack?        |
-					    | to-json             |
-					    | equal               |
-					    +---------------------+
-						      |
-						      |
-						      ^
-						      |
-						      |
+                                            +---------------------+                   +-----------+
+                                            |       next%         |--- implements --> | equals<%> |
+                                            +---------------------+                   +-----------+
+                                            | _public_            |
+                                            | interpret           |
+                                            +---------------------+
+                                                      |
+                                                      |
+                                                      ^
+                                                      |
+                                                      |
            +------------------------+------------------------------+-------------------+
-           |			    |				   |		       |
+           |                        |                              |                   |
 +----------------------+   +---------------------+   +---------------------+  +---------------------+
 | store-fat-on-tissue% |   |     feed-none%      |   |   feed-vegetarian%  |  |   feed-carnivore%   |
 +----------------------+   +---------------------+   +---------------------+  +---------------------+
@@ -142,6 +138,8 @@
 (define (feed-carnivore attacker p0 attackee)
   (new feed-carnivore% [attacker attacker][p0  p0] [attackee attackee]))
 
+(define-local-member-name acceptable?)
+
 (define next%
   (class object% 
     (super-new)
@@ -151,7 +149,6 @@
     (define/public (equal-secondary-hash-code-of hash-code) 999)
     
     (define/public (acceptable? other) #false)
-    (define/public (self-attack? p) #false)
     
     (abstract interpret to-json)))
 
