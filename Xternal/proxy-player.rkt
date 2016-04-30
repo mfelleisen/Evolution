@@ -52,13 +52,13 @@
     (define/public (choose pre-boards -postboards)
       (parameterize ([current-input-port in] [current-output-port out])
         (send-message (choose->json pre-boards -postboards))
-        (receive-external json->action4)))
+        (json->action4 (read-message))))
     
     ;; EFFECT if the json is incorrect, throw exception 
     (define/public (feed-next bag0 boards0 cards0 watering-hole other-boards)
       (parameterize ([current-input-port in] [current-output-port out])
         (send-message (state->json bag0 boards0 cards0 watering-hole other-boards))
-        (receive-external json->next)))))
+        (json->next (read-message))))))
 
 ;; Natural [Listof Species] [Listof Card] -> JSexpr 
 (define (start->json wh bag boards cards)

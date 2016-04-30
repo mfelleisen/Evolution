@@ -43,7 +43,7 @@
 
 (define (create-proxy-dealer-infsu in out player (sign-up "must pass"))
   (new proxy-dealer-infsu% [in in][out out][player player][sign-up sign-up]))
-  
+
 ;; ===================================================================================================
 (define proxy-dealer-infsu%
   (class object%
@@ -78,19 +78,17 @@
          #'(state: from json->in out->json to alt)]
         [(_ from json->in out->json to alt)
          #'[lambda ([input* #f])
-             (define input (or input* (read-json))) ;; <-- do not impose time-out
-	     (log-info "raw input ~a" input)
+             (define input (or input* (read-json))) ;; <-- do not impose time-out with read-message
+             (log-info "raw input ~a" input)
              (cond
                [(eof-object? input)
                 (close-input-port in)
                 (close-output-port out)]
                [else
-                (match-define `(,ok? ,parsed) (from-json json->in input))
-                (cond
-                  [(not ok?) (alt input)]
-                  [else
-                   (out->json (send player from . parsed))
-                   (to)])])]]))
+                (with-handlers ((exn:misc:match? (lambda (xn) (alt input))))
+                  (define parsed (json->in input))
+                  (out->json (send player from . parsed))
+                  (to))])]]))
     
     (define/private ((err from) input)
       (error 'proxy-dealer "bad message in state: ~a: ~e" from input))

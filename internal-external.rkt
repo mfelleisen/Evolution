@@ -17,10 +17,6 @@
  ;; is a unique value that satisfies client-error?
  send-to-external
 
- ;; [JSexpr -> X] -> X
- ;; EFFECT: raise CLIENT-ERROR
- receive-external
-
  ;; Any -> Boolean 
  client-error?)
 
@@ -45,7 +41,7 @@
       (thread
        (lambda ()
          (with-handlers ((client-error? (curry channel-put ch))
-                         (void (handler id ok ch)))
+                         (exn? (handler id ok ch)))
            (channel-put ch (ok (send p m a ...))))))
       (define result (sync/timeout TIMEOUT ch))
       (custodian-shutdown-all c)
@@ -68,15 +64,6 @@
 (struct client-error ())
 (define CLIENT-ERROR (client-error))
 
-(define (receive-external json->value)
-  (define in (read-message))
-  (match-define `(,ok? ,msg) (from-json json->value in))
-  (cond
-    [ok? msg]
-    [else
-     (log-info "proxy player says: client sent the wrong kind of JSON: ~a" (exn-message msg))
-     (raise CLIENT-ERROR)]))
-
 ;; ===================================================================================================
 (module+ test
 
@@ -93,9 +80,4 @@
   (check-equal? (send-to-external 1 test good) GOOD)
   (check-equal? (send-to-external 1 test better) #false)
   (check-true (client-error? (send-to-external 2 test raise-exn)))
-  (check-true (client-error? (send-to-external 3 test diverge)))
-  
-  (define (json->false f) (match f [#f #f]))
-  (check-exn client-error?
-             (lambda ()
-               (with-input-from-string "" (lambda () (receive-external json->false))))))
+  (check-true (client-error? (send-to-external 3 test diverge))))

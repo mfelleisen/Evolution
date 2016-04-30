@@ -47,23 +47,6 @@
   (and (cons? inputs) (empty? (rest inputs))))
 
 ;; =============================================================================
-;; JSON
-
-(provide
- 
- ;; [JSexpr -> X] JSexpr -> [List Boolean (U X Exn)]
- ;; really: returns (values #f Exn) or (values #t X)
- ;; 
- ;; [list #t (convert x)] if the latter succeeds
- ;; [list #f exn] if (convert x) fails with exn:misc:match
- from-json)
-
-;; -----------------------------------------------------------------------------
-(define (from-json convert x)
-  (with-handlers ((exn:misc:match? (lambda (xn) (list #f xn))))
-    (list #t (convert x))))
-
-;; =============================================================================
 ;; CONDITIONAL ACCESS AND SEND 
 
 (provide
