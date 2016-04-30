@@ -3,7 +3,7 @@
 ;; ===================================================================================================
 ;; a proxy dealer
 
-(require "player-external.rkt")
+(require "next.rkt")
 
 (define dealer-external/c
   (object/c
@@ -11,15 +11,18 @@
 
 (provide
  (contract-out
-  (create-proxy-dealer-infsu
-   (->* (input-port? output-port? external-player/c) (string?) dealer-external/c))
-  (create-proxy-dealer-bad-sign-up
-   (->* (input-port? output-port? external-player/c) (string?) dealer-external/c))
+  ;; the optional strings are sign-up strings 
   [create-proxy-dealer
-   (->* (input-port? output-port? external-player/c) (string?) dealer-external/c)]))
+   (->* (input-port? output-port? external-player/c) (string? #;jsexpr) dealer-external/c)]
+  (create-proxy-dealer-infsu
+   ;; go into infinite loop during sign up
+   (->* (input-port? output-port? external-player/c) (string? #;any-string) dealer-external/c))
+  (create-proxy-dealer-bad-sign-up
+   ;; send bad kind of strings for sign-up
+   (->* (input-port? output-port? external-player/c) (string? #;any-string) dealer-external/c))))
 
 ;; ===================================================================================================
-(require "board.rkt" "cards.rkt" "common.rkt" "basics.rkt" json)
+(require "player-external.rkt" "board.rkt" "cards.rkt" "common.rkt" "basics.rkt" json)
 
 (module+ test
   (require "traits.rkt" (submod "..") (submod "common.rkt" test) json rackunit))

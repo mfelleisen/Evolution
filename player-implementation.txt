@@ -1,7 +1,29 @@
-#lang racket
 
-#| ---------------------------------------------------------------------------------------------------
-   composite pattern for player implementations
+Every player needs some basic functionality for choosing cards and picking
+which species board to feed next. This functionality is put into 
+      
+ basic-pplayer%
+
+which also provides a basic equality implementation. The dealer needs to
+make sure that it has complete knowledge of an external player's state and
+its possibilities. This is dealt with in 
+
+ player%
+
+Finally, a player needs to implement strategies for starting a turn,
+choosing card actions, and picking species boards. Those go into 
+
+ external-player%
+
+The 
+
+ proxy-player% 
+
+bridges the gap between the dealer and an external player running on a
+remote computer. Up to some pre-condition, it satisfies the same contract
+and interface as external-player%. 
+
+
        
                                  +----------------------+                   +----------------------+
                                  |     basic-player%    |--- implements --> |      equal<%>        | 
@@ -44,5 +66,3 @@
   | move-food-to-bag     |
   | score                |
   +----------------------+                                   
-
---------------------------------------------------------------------------------------------------- |#

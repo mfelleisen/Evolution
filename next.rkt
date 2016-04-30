@@ -1,14 +1,17 @@
 #lang racket
 
 ;; ===================================================================================================
-;; represent the possible choices an external player may return when asked to pick the next feeding
+;; the ontology between dealer and external player for start, choose, and feed-next interactions
 
-(require (only-in "basics.rkt" maybe/c natural? natural+?) "cards.rkt")
+;; SERVICES
 
-(define EXTINCTION-CARDS 2)
+(require (only-in "board.rkt" species/c)
+         "internal-external.rkt"
+          "cards.rkt"
+          (only-in "basics.rkt" maybe/c natural? natural+?))
 
-(define jsexpr/c any/c)
-
+;; --- choose card actions ---
+(define action4/c any/c)
 ;; Action4 = [List N GP* GB* BT* RT*]  ; the actions each player wishes to perform
 ;; type GP*     = [Listof GP]       ; the growth-of-population actions
 ;; type GB*     = [Listof GB]       ; the growth-of-body actions
@@ -18,67 +21,10 @@
 ;; type GB      = [List N N]        ; [list b c] trades card c for growth of population b
 ;; type BT      = [List N N^0..3]   ; [cons pc t] pays card pc for new species with traits t
 ;; type RT      = [List N N N]      ; [list b cO cN] replaces trait cO at b for trait card cN
-(define action4/c any/c)
 
-(define internal-player/c
-  (object/c
-   ;; external communications 
-   [start     (->m natural?    [maybe/c void?])]
-   [feed-next (->m any/c any/c [maybe/c (recursive-contract next/c)])]
-   [choose    (->m any/c       [maybe/c action4/c])]
-   [apply-card-action
-    ;; determine the card that this player wishes to 'donate' to the watering hole
-    ;; EFFECT apply the desired actions on cards to this player 
-    (->m action4/c card?)]))
-
-(define players/c [listof internal-player/c])
-
-(define dealer-next/c
-  (object/c
-   [feed-a-player-s-species
-    ;; (feed-a-player-s-species ip s) this dealer executes a complete feeding act for ip's species s
-    (->m internal-player/c natural? any/c)]
-   [feed-scavengers
-    ;; (feed-scavengers ip) this dealer feeds all of its scavengers, starting from ip in turn order
-    (->m internal-player/c any/c)]
-   [give-cards-to
-    ;; (give-cards-to ip c) this dealer hands the give cards c to ip
-    (->m internal-player/c natural+? any/c)]
-   [store-fat
-    ;; (store-fat ip s n) this dealer places n fat foods on ip's species s
-    (->m internal-player/c natural? natural? any/c)]))
-
-(define next/c
-  (object/c
-   [interpret (->m dealer-next/c players/c players/c players/c)]
-   [to-json   (->m jsexpr/c)]))
-
-(provide
- EXTINCTION-CARDS
- 
- dealer-next/c
- internal-player/c
- next/c
- 
- (contract-out
-  [one-of (-> any/c [listof next/c] boolean?)]
-  
-  [feed-none           (-> next/c)]
-  [feed-vegetarian     (-> natural? next/c)]
-  [store-fat-on-tissue (-> natural? natural+? next/c)]
-  [feed-carnivore      (-> natural? natural? natural? next/c)]))
-
-;; ===================================================================================================
-
-(require (except-in "basics.rkt" maybe/c natural? natural+?))
-
-;; for debugging
-(require  "common.rkt")
-
-(module+ test
-  (require rackunit))
-
-;; ===================================================================================================
+;; --- the feed-next pick --
+;; the dealer asks the external player, via the internal one, for a pick,
+;; which is represented as an instance of next%
 
 #| ---------------------------------------------------------------------------------------------------
    interpreter pattern for responses from feed-next
@@ -94,7 +40,9 @@
 					    | equal               |
 					    +---------------------+
 						      |
+						      |
 						      ^
+						      |
 						      |
            +------------------------+------------------------------+-------------------+
            |			    |				   |		       |
@@ -103,6 +51,90 @@
 +----------------------+   +---------------------+   +---------------------+  +---------------------+
 
 --------------------------------------------------------------------------------------------------  |#
+
+;; an object contract that describes what a feed-next interaction expects from the player 
+(define internal-player/c
+  (object/c
+   ;; external communications 
+   [start     (->m natural?    [maybe/c void?])]
+   [feed-next (->m any/c any/c [maybe/c (recursive-contract next/c)])]
+   [choose    (->m any/c       [maybe/c action4/c])]
+   [apply-card-action
+    ;; determine the card that this player wishes to 'donate' to the watering hole
+    ;; EFFECT apply the desired actions on cards to this player 
+    (->m action4/c card?)]))
+
+(define players/c [listof internal-player/c])
+
+;; an object contract that describes what a feed-next interaction expects from the dealer
+(define dealer-next/c
+  (object/c
+   [feed-a-player-s-species
+    ;; (feed-a-player-s-species ip s) this dealer executes a complete feeding act for ip's species s
+    (->m internal-player/c natural? any/c)]
+   [feed-scavengers
+    ;; (feed-scavengers ip) this dealer feeds all of its scavengers, starting from ip in turn order
+    (->m internal-player/c any/c)]
+   [give-cards-to
+    ;; (give-cards-to ip c) this dealer hands the give cards c to ip
+    (->m internal-player/c natural+? any/c)]
+   [store-fat
+    ;; (store-fat ip s n) this dealer places n fat foods on ip's species s
+    (->m internal-player/c natural? natural? any/c)]))
+
+;; represents an external player's choice what to do next during a feeding cycle 
+(define next/c
+  (object/c
+   [interpret (->m dealer-next/c players/c players/c players/c)]))
+
+;; an object contrat that describes what an external player needs to communicate with the dealer
+(define (err c) (or/c client-error? c))
+(define CARDS-BEFORE-CHOOSE 4) ;; should be (+ CARDS-PER-BOARD CARD-PER-PLAYER)
+
+(define (pre-choose external-player)
+  (>= (length (get-field cards external-player)) CARDS-BEFORE-CHOOSE))
+
+(define boards/c [listof species/c])
+(define (external-player/c pre-choose)
+  (object/c
+   [start      (->m natural? natural? boards/c [listof card?]                    [err any/c])]
+   [choose     (->dm ([before [listof boards/c]] [after [listof boards/c]])
+                     #:pre (pre-choose this)                                     [err action4/c])]
+   [feed-next  (->m natural? boards/c [listof card?] natural+? [listof boards/c] [err next/c])]))
+
+(define EXTINCTION-CARDS 2)
+
+(provide
+ EXTINCTION-CARDS
+
+ action4/c
+ dealer-next/c
+ internal-player/c
+ next/c
+ external-player/c
+ pre-choose
+ 
+ (contract-out
+  [one-of (-> any/c [listof next/c] boolean?)]
+  
+  [feed-none           (-> next/c)]
+  [feed-vegetarian     (-> natural? next/c)]
+  [store-fat-on-tissue (-> natural? natural+? next/c)]
+  [feed-carnivore      (-> natural? natural? natural? next/c)]))
+
+;; ===================================================================================================
+;; DEPENDENCIES
+
+(require (except-in "basics.rkt" maybe/c natural? natural+?))
+
+;; for debugging
+(require  "common.rkt")
+
+(module+ test
+  (require rackunit))
+
+;; ===================================================================================================
+;; IMPLEMENTATION
 
 (define (feed-none) (new feed-none%))
 (define (feed-vegetarian s) (new feed-vegetarian% [s s]))

@@ -1,6 +1,4 @@
 
-===================================================================================================
-
 The system has two entry points: 
 
  -- xmain: creates n player objects and hands those to a dealer to play one complete game

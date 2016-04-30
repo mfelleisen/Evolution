@@ -3,7 +3,7 @@
 ;; ===================================================================================================
 ;; a proxy player 
 
-(require (only-in "player-external.rkt" external-player/c)
+(require (only-in "next.rkt" external-player/c)
          (only-in "basics.rkt" natural? natural+?))
 
 (provide

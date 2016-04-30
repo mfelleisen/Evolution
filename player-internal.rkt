@@ -8,10 +8,7 @@
          (only-in "basics.rkt" natural? natural+?)
          (only-in "next.rkt" internal-player/c next/c))
 
-;; constants
-(define CARDS-PER-BOARD 1)
-(define CARD-PER-PLAYER 3)
-
+;; the contract that the dealer expects to communicate with the internal player representation 
 (define internal-communication/c
   (and/c
    internal-player/c
@@ -62,6 +59,10 @@
     [equal-secondary-hash-code-of any/c]
     [equal-hash-code-of           any/c]
     [equal-to? 		 	  any/c])))
+
+;; constants
+(define CARDS-PER-BOARD 1)
+(define CARD-PER-PLAYER 3)
 
 (provide
  CARDS-PER-BOARD

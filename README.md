@@ -1,11 +1,17 @@
 # Evolution
 
 This repo represents my implementation of the Evolution game for [Software Development @
-NU CCIS S'2016](http://www.ccs.neu.edu/home/matthias/4500-s16/). 
+NU CCIS S'2016](http://www.ccs.neu.edu/home/matthias/4500-s16/). The course did not use
+the official rules of the game but a [simplified and modified
+version](http://www.ccs.neu.edu/home/matthias/4500-s16/evolution.html) [also see the
+students' frequently asked question and my answers](http://www.ccs.neu.edu/home/matthias/4500-s16/faq.html).
 
 The implementation supports both a sequential implementation that integrates Racket-based
 player implementations statically and a distributed implementation for interacting with
 players implemented in other languages.
+
+For simple, deterministic runs, use xmain on the command line and supply a number
+between 3 and 8. 
 
 TOOD
 ----
@@ -14,6 +20,7 @@ TOOD
 2. clean up common
 3. clean up add a description of communication between pieces 
 4. bring back gui in xserver 
+5. put json-> for test harnesses in proper place (test modules)
 
 Files, Modules and Dependencies 
 -------------------------------

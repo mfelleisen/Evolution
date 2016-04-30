@@ -3,54 +3,38 @@
 ;; ===================================================================================================
 ;; the silly player -- one possible implementation of the external player
 
-(require  "internal-external.rkt"
-          (only-in "board.rkt" species/c)
-          (only-in "cards.rkt" card?)
-          (only-in "basics.rkt" natural? natural+?))
-
-(define boards/c [listof species/c])
-(define (err c) (or/c client-error? c))
-(define action4 any/c)
-(define next any/c)
-(define jsexpr/c any/c)
-
-(define (external-player/c pre-choose)
-  (object/c
-   [start      (->m natural? natural? boards/c [listof card?]                    [err any/c])]
-   [choose     (->dm ([before [listof boards/c]] [after [listof boards/c]])
-                     #:pre (pre-choose this)                                     [err action4])]
-   [feed-next  (->m natural? boards/c [listof card?] natural+? [listof boards/c] [err next])]))
-
-(define (pre-choose external-player)
-  (>= (length (get-field cards external-player)) CARDS-BEFORE-CHOOSE))
-
-(define CARDS-BEFORE-CHOOSE 4) ;; should be (+ CARDS-PER-BOARD CARD-PER-PLAYER)
+(require (only-in "next.rkt" external-player/c action4/c pre-choose)
+         (only-in "cards.rkt" card?)
+         (only-in "basics.rkt" natural? natural+?))
 
 (provide
- external-player/c
- 
  (contract-out
   [create-external (-> (external-player/c pre-choose))]
-  [json->player    (-> jsexpr/c (external-player/c pre-choose))]
-  [action4->json   (-> action4 jsexpr/c)])
+  [json->player    (-> any/c (external-player/c pre-choose))]
+  [action4->json   (-> action4/c any/c)])
 
- ;; [Natural Boards Cards Natural Players -> Any] -> ExternalPlayer 
+ ;; [Natural Boards Cards Natural Players -> Any] -> ExternalPlayer
+ ;; creating players that act badly during feed-next
  create-bad-feed
 
  ;; Natural -> [Natural Boards Cards Natural Players -> Any]
+ ;; ways to act badly during feed-next after a while 
  feed-inf
  feed-bad 
  
- ;; [Cards Boards -> Any] -> ExternalPlayer 
+ ;; [Cards Boards -> Any] -> ExternalPlayer
+ ;; creating players that act badly durinh choose
  create-bad-choose
 
  ;; Natural -> [Cards Boards -> Any]
+ ;; ways to act badly during choose after a while 
  no-fc
  over-growth
  choice-inf)
 
 ;; ===================================================================================================
-(require "player-base.rkt" "next.rkt" "traits.rkt"
+(require "player-base.rkt" "traits.rkt"
+         (except-in "next.rkt" external-player/c action4/c pre-choose)
          (except-in "board.rkt" species/c)
          (except-in "cards.rkt" card?))
 

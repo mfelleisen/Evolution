@@ -4,8 +4,7 @@
 ;; represent a dealer and its internal representation of a state
 
 (require (only-in "player-internal.rkt" internal-player/c)
-         (only-in "player-external.rkt" external-player/c)
-         (only-in "next.rkt" dealer-next/c)
+         (only-in "next.rkt" dealer-next/c  external-player/c)
          (only-in "cards.rkt" card?)
          (only-in "basics.rkt" natural? between)
          "observer.rkt"
@@ -14,14 +13,13 @@
 (define MIN-PLAYERS 3)
 (define MAX-PLAYERS 8)
 
+;; the interface of the dealer for external uses (xmain, xserver, etc) 
 (define dealer-proper/c
   (object/c
-   [to-json
-    ;; 
-    (->m jsexpr?)]
    [register-observer (->m observer/c any)]
    [run-game (->m any/c)]))
 
+;; the full interface 
 (define dealer/c (and/c dealer-proper/c dealer-next/c))
 
 (provide
@@ -34,10 +32,13 @@
  
  (contract-out
   [create-dealer
+   ;; expects a list of named (string) players that satisfy the external player interface
    (->* [(and/c [listof (list/c string? external-player/c)] (between MIN-PLAYERS MAX-PLAYERS))]
         dealer/c)]))
 
 ;; ===================================================================================================
+;; DEPENDENCIES
+
 (require (only-in "player-external.rkt" json->player)
          (only-in "player-internal.rkt" create-player CARDS-PER-BOARD CARD-PER-PLAYER)
          (except-in "cards.rkt" card?) 
@@ -58,8 +59,6 @@
   (require (submod "common.rkt" test)))
 
 ;; ===================================================================================================
-(define TITLE "Evolution: the dealer view")
-
 (define (create-dealer players)
   (new dealer% [externals players][cards #;shuffle all-cards]))
 
