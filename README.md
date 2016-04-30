@@ -21,9 +21,7 @@ TOOD
 3. clean up add a description of communication between pieces 
 4. bring back gui in xserver 
 5. put json-> for test harnesses in proper place (test modules)
-6. name proxy-server and proxy-player properly 
 7. re-think the case when a player cannot eat now, but later when a "victim" becomes available 
--. move distributed part to subdirectory 
 9. document JSON in this subdirectory's README 
 
 Files, Modules and Dependencies 
@@ -46,16 +44,13 @@ Files, Modules and Dependencies
 | cards   	    | a data representation of cards          				 |
 | gui     	    | a gui mixin for displaying 2htdp/images 				 |
 | basics     	    | functions, contracts, syntax that could come from Racket		 |
-| 	      	    |									 |
-| proxy-player 	    | a proxy player for the server to connect to remote clients 	 |
-| proxy-dealer 	    | a proxy dealer for the client to connect to remote servers    	 |
-| proxy-json-tests  | a unit test suite for relation json-> and ->json functions	 |
-| proxy-server 	    | a server for running Evolution remotely  	  	 		 |
-| proxy-client 	    | a client for generating Evolution clients				 |
 | 		    | 	       	   	      						 |
 | xmain 	    | an executable for running a sequential game for n players		 |
 | 		    | 	       	   	      						 |
 | Xternal	    | directory for playing in distributed mode 			 |
+| 		    | 	       	   	      						 |
+| common     	    | some project-cross-cutting things					 |
+| json-pretty       | this must go to json library					 |
 
 Compiling 
 ---------
