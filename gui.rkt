@@ -3,6 +3,8 @@
 ;; ===================================================================================================
 ;; a class for displaying an image on a monitor
 
+;; EXTERNAL SERVICES
+
 (require "observer.rkt")
 
 (provide
@@ -12,9 +14,13 @@
                   observer/c)]))
 
 ;; ===================================================================================================
+;; DEPENDENCIES
+
 (require 2htdp/image json)
 
 ;; ===================================================================================================
+;; IMPLEMENTATION
+
 (define WIDTH 1200)
 (define HEIGHT 800)
 (define INSET 10)

@@ -3,6 +3,8 @@
 ;; ===================================================================================================
 ;; represent a dealer and its internal representation of a state
 
+;; EXTERNAL SERVICES
+
 (require (only-in "player-internal.rkt" internal-player/c)
          (only-in "next.rkt" dealer-next/c  external-player/c)
          (only-in "cards.rkt" card?)
@@ -59,6 +61,8 @@
   (require (submod "common.rkt" test)))
 
 ;; ===================================================================================================
+;; IMPLEMENTATION
+
 (define (create-dealer players)
   (new dealer% [externals players][cards #;shuffle all-cards]))
 

@@ -3,6 +3,8 @@
 ;; ===================================================================================================
 ;; the silly player -- one possible implementation of the external player
 
+;; EXTERNAL SERVICES
+
 (require (only-in "next.rkt" external-player/c action4/c pre-choose)
          (only-in "cards.rkt" card?)
          (only-in "basics.rkt" natural? natural+?))
@@ -33,6 +35,7 @@
  choice-inf)
 
 ;; ===================================================================================================
+;; DEPENDENCIES
 (require "player-base.rkt" "traits.rkt"
          (except-in "next.rkt" external-player/c action4/c pre-choose)
          (except-in "board.rkt" species/c)
@@ -46,6 +49,8 @@
   (require (submod "common.rkt" test) "common.rkt"))
 
 ;; ===================================================================================================
+;; IMPLEMENTATION
+
 (define (create-external)
   (new external%))
 

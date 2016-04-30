@@ -3,6 +3,8 @@
 ;; ===================================================================================================
 ;; representing individual cards and the set of all cards as specified in the rules of Evolution
 
+;; EXTERNAL SERVICES
+
 (provide
  ;; type Card = (card FoodPoints Trait)
  (struct-out card)
@@ -34,12 +36,16 @@
  card->json)
 
 ;; ===================================================================================================
+;; DEPENDENCIES
+
 (require "traits.rkt" "basics.rkt" 2htdp/image)
 
 (module+ test
   (require rackunit))
 
 ;; ===================================================================================================
+;; IMPLEMENTATION
+
 (struct card (food-points trait) #:transparent)
 
 ;; ---------------------------------------------------------------------------------------------------

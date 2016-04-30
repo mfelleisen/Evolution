@@ -3,6 +3,8 @@
 ;; ===================================================================================================
 ;; represent a base player and an internal from the perspective of the dealer
 
+;; EXTERNAL SERVICES
+
 (require (only-in "board.rkt" species/c)
          (only-in "cards.rkt" valid-card?)
          (only-in "basics.rkt" natural? natural+?)
@@ -88,6 +90,7 @@
           [r internal-player/c])])))
 
 ;; ===================================================================================================
+;; DEPENDENCIES
 (require "player-base.rkt" "internal-external.rkt"
          (except-in "cards.rkt" valid-card?)
          (except-in "next.rkt" internal-player/c)
@@ -102,8 +105,7 @@
   (require rackunit))
 
 ;; ===================================================================================================
-(define (player? x)
-  (is-a? x player%))
+;; IMPLEMENTATION
 
 (define (create-player name external)
   (define p (new player% [id name]))

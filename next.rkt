@@ -3,7 +3,7 @@
 ;; ===================================================================================================
 ;; the ontology between dealer and external player for start, choose, and feed-next interactions
 
-;; SERVICES
+;; EXTERNAL SERVICES
 
 (require (only-in "board.rkt" species/c)
          "internal-external.rkt"

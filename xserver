@@ -7,6 +7,8 @@ exec racket -W info -tm "$0" ${1+"$@"}
 ;; ===================================================================================================
 ;; a server for an Evolution game
 
+;; EXTERNAL SERVICES
+
 (require (only-in "basics.rkt" valid-port/c))
 
 (define WAIT-FOR 10)
@@ -24,6 +26,7 @@ exec racket -W info -tm "$0" ${1+"$@"}
   [main (->* [] [(and/c string->number valid-port/c) string?] any)]))
 
 ;; ===================================================================================================
+;; DEPENDENCIES
 (require "gui.rkt" "dealer.rkt" "proxy-player.rkt" "common.rkt" json)
 
 (module+ test
@@ -31,6 +34,7 @@ exec racket -W info -tm "$0" ${1+"$@"}
            [rename-in "xmain" [main sequential]] rackunit))
 
 ;; ===================================================================================================
+;; IMPLEMENTATION
 (define MAX-TCP  30)
 (define REOPEN   #t)
 

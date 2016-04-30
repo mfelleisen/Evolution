@@ -8,15 +8,20 @@ exec racket -tm "$0" ${1+"$@"}
 ;; runs a complete sequential game with n players on localhost port 56789, compare with
 ;;   $ ./xdist n
 
+;; EXTERNAL SERVICES
+
 (provide
   ;; StringN -> Void
   ;; accept a number beween MIN-PLAYERS and MAX-PLAYERS
   main)
 
 ;; ===================================================================================================
+;; DEPENDENCIES
+
 (require "dealer.rkt" "player-external.rkt" "common.rkt")
 
 ;; ===================================================================================================
+;; IMPLEMENTATION
 (define (main n-string (name number->string))
   (define n (string->number n-string))
   (unless (and n (<= MIN-PLAYERS n MAX-PLAYERS))

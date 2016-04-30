@@ -3,6 +3,8 @@
 ;; =============================================================================
 ;; a JSON-based observer for Dealer and GUI
 
+;; EXTERNAL SERVICES
+
 (provide
  dealer0
  dealer->image
@@ -44,8 +46,11 @@
 (define dealer0   `[ ,players0 ,food0 ,cards0])
 
 ;; ===================================================================================================
+;; DEPENDENCIES
 (require "cards.rkt" "traits.rkt" "basics.rkt" 2htdp/image)
 
+;; ===================================================================================================
+;; IMPLEMENTATION
 (define (dealer->image j)
   (match j
     [`(,iplayers ,food ,cards)

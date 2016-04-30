@@ -7,6 +7,8 @@ exec racket -W info -tm "$0" ${1+"$@"}
 ;; ===================================================================================================
 ;; a module for spawning a bunch of client players 
 
+;; EXTERNAL SERVICES
+
 (require (only-in "basics.rkt" valid-port/c) (only-in "dealer.rkt" MAX-PLAYERS MIN-PLAYERS))
 
 (provide 
@@ -20,11 +22,14 @@ exec racket -W info -tm "$0" ${1+"$@"}
              any)]))
 
 ;; ===================================================================================================
+;; DEPENDENCIES
+
 (require (rename-in "proxy-client.rkt" [main create-client])
          (except-in "basics.rkt" valid-port/c)
          "common.rkt")
 
 ;; ===================================================================================================
+;; IMPLEMENTATION
 (define (main s0 (b0 "") (host LOCALHOST) (p0 REMOTE-PORT))
   (define s (string->number s0))
   (define p (if (number? p0) p0 (string->number p0)))

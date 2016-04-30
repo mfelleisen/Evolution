@@ -3,6 +3,8 @@
 ;; ===================================================================================================
 ;; a proxy dealer
 
+;; EXTERNAL SERVICES
+
 (require "next.rkt")
 
 (define dealer-external/c
@@ -22,12 +24,14 @@
    (->* (input-port? output-port? external-player/c) (string? #;any-string) dealer-external/c))))
 
 ;; ===================================================================================================
+;; DEPENDENCIES
 (require "player-external.rkt" "board.rkt" "cards.rkt" "common.rkt" "basics.rkt" json)
 
 (module+ test
   (require "traits.rkt" (submod "..") (submod "common.rkt" test) json rackunit))
 
 ;; ===================================================================================================
+;; IMPLEMENTATION
 
 (define SIGN-UP `"my name is matthias")
 

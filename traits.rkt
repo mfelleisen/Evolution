@@ -3,6 +3,8 @@
 ;; ===================================================================================================
 ;; representing Evolution traits (mechanisms for specifying, rendering, and comparing traits)
 
+;; EXTERNAL SERVICES
+
 (provide
  ;; type Trait
 
@@ -44,12 +46,15 @@
  cooperation? fat-tissue? fertile? foraging? long-neck? scavenger? symbiosis?)
 
 ;; ===================================================================================================
+;; DEPENDENCIES
 (require "basics.rkt" 2htdp/image)
 
 (module+ test
   (require rackunit))
 
 ;; ===================================================================================================
+;; IMPLEMENTATION
+
 ;; syntax: use singleton-pattern to represent traits via structs
 
 ;; (define-traits n:id t1:id ... tn:id)

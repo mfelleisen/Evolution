@@ -3,6 +3,8 @@
 ;; ===================================================================================================
 ;; represent a sepcies board
 
+;; EXTERNAL SERVICES
+
 (require (only-in "traits.rkt" trait?) (only-in "basics.rkt" natural? between unique/c))
 
 (define MIN-TRAITS 0)
@@ -93,6 +95,8 @@
  json->opt-species)
 
 ;; ===================================================================================================
+;; DEPENDENCIES
+
 (require (except-in "traits.rkt" trait?) (except-in "basics.rkt" natural? between) 2htdp/image)
 
 ;; for debugging
@@ -106,7 +110,7 @@
   (testing (lambda (x y z w) (send x attackable? y z w))))
 
 ;; ===================================================================================================
-;; CONSTANTS
+;; IMPLEMENTATION
 
 (define HARD-SHELL-ATTACK 4)
 (define HORN-DAMAGE -1)

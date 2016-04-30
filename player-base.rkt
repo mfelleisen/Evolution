@@ -3,6 +3,8 @@
 ;; ===================================================================================================
 ;; basic functionality for both internal and external players (to keep up-to-date, if they wish)
 
+;; EXTERNAL SERVICES
+
 (require "board.rkt" (only-in "cards.rkt" card?) (only-in "basics.rkt" natural? natural+?))
 
 (define species-index-list/c [listof natural?])
@@ -25,6 +27,7 @@
   [base-player%  base-player/c]))
 
 ;; ===================================================================================================
+;; DEPENDENCIES
 (require "traits.rkt" (except-in "cards.rkt" card?) (except-in "basics.rkt" natural? natural+?)
          2htdp/image)
 
@@ -32,6 +35,8 @@
 (require  "common.rkt")
 
 ;; ===================================================================================================
+;; IMPLEMENTATION
+
 ;; the base class for players: every player must have these fields and methods 
 (define base-player%
   (class* object% (equal<%>)

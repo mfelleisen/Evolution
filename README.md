@@ -21,6 +21,7 @@ TOOD
 3. clean up add a description of communication between pieces 
 4. bring back gui in xserver 
 5. put json-> for test harnesses in proper place (test modules)
+6. name proxy-server and proxy-player properly 
 
 Files, Modules and Dependencies 
 -------------------------------

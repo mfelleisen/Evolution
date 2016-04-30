@@ -8,6 +8,8 @@ exec racket -tm "$0" ${1+"$@"}
 ;; runs a complete distrbuted game with n players on localhost port 56789, compare with
 ;;   $ ./xmain n
 
+;; EXTERNAL SERVICES
+
 (require (only-in "dealer.rkt" MAX-PLAYERS MIN-PLAYERS) "basics.rkt")
 
 (provide
@@ -16,10 +18,14 @@ exec racket -tm "$0" ${1+"$@"}
 	      any)]))
 
 ;; ===================================================================================================
+;; DEPENDENCIES
+
 (require (rename-in "xserver" [main server])
          (rename-in "xclients" [main clients]))
 
 ;; ===================================================================================================
+;; IMPLEMENTATION
+
 (define (main n-string)
   (define s (thread (lambda () (server "56789"))))
   (with-output-to-string (lambda () (clients n-string "" "localhost" "56789")))

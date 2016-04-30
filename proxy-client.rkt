@@ -7,6 +7,8 @@ exec racket -tm "$0" ${1+"$@"}
 ;; ===================================================================================================
 ;; a one-player client for an Evolution player
 
+;; EXTERNAL SERVICES
+
 (define-type Client (->* (Natural) (String Natural) Void))
 
 (provide:
@@ -52,6 +54,8 @@ exec racket -tm "$0" ${1+"$@"}
   (-> Natural Client)))
 
 ;; ===================================================================================================
+;; DEPENDENCIES
+
 (define-type Dealer (->* (Input-Port Output-Port Any) (String) (Object [run-game (-> Void)])))
 
 (require/typed
@@ -81,6 +85,7 @@ exec racket -tm "$0" ${1+"$@"}
  [debug (-> Any Any)])
 
 ;; ===================================================================================================
+;; IMPLEMENTATION
 
 (define TRIES 3)
 (define WAIT-FOR 2)

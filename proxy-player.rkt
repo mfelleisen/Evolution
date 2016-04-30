@@ -3,6 +3,8 @@
 ;; ===================================================================================================
 ;; a proxy player 
 
+;; EXTERNAL SERVICES
+
 (require (only-in "next.rkt" external-player/c)
          (only-in "basics.rkt" natural? natural+?))
 
@@ -17,6 +19,7 @@
    state->json))
 
 ;; ===================================================================================================
+;; DEPENDENCIES
 (require "next.rkt" "internal-external.rkt"
          (except-in "cards.rkt" card?)
          "basics.rkt"
@@ -26,6 +29,7 @@
   (require "board.rkt" "traits.rkt" (submod "..") (submod "common.rkt" test) rackunit))
 
 ;; ===================================================================================================
+;; IMPLEMENTATION
 
 (define (create-proxy-player in out)
   (new proxy-player% [in in][out out]))

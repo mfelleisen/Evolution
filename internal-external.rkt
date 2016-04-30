@@ -3,6 +3,8 @@
 ;; =============================================================================
 ;; a library that protects calls from exceptions and overly slow clients 
 
+;; EXTERNAL SERVICES
+
 (define TIMEOUT 1)
 
 (provide
@@ -23,12 +25,15 @@
  client-error?)
 
 ;; =============================================================================
+;; DEPENDENCIES
+
 (require "basics.rkt" "common.rkt")
 
 (module+ test
   (require rackunit))
 
 ;; =============================================================================
+;; IMPLEMENTATION
 
 (define-syntax-rule
   (send-to-external id p m a ...)
