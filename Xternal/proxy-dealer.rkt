@@ -5,7 +5,7 @@
 
 ;; EXTERNAL SERVICES
 
-(require "next.rkt")
+(require "../next.rkt")
 
 (define dealer-external/c
   (object/c
@@ -25,10 +25,10 @@
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
-(require "player-external.rkt" "board.rkt" "cards.rkt" "common.rkt" "basics.rkt" json)
+(require "../player-external.rkt" "../board.rkt" "../cards.rkt" "../common.rkt" "../basics.rkt" json)
 
 (module+ test
-  (require "traits.rkt" (submod "..") (submod "common.rkt" test) json rackunit))
+  (require (submod "..") "../traits.rkt" (submod "../common.rkt" test) json rackunit))
 
 ;; ===================================================================================================
 ;; IMPLEMENTATION

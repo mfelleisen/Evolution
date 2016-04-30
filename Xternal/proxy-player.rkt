@@ -5,8 +5,8 @@
 
 ;; EXTERNAL SERVICES
 
-(require (only-in "next.rkt" external-player/c)
-         (only-in "basics.rkt" natural? natural+?))
+(require (only-in "../next.rkt" external-player/c)
+         (only-in "../basics.rkt" natural? natural+?))
 
 (provide
  (contract-out
@@ -20,13 +20,14 @@
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
-(require "next.rkt" "internal-external.rkt"
-         (except-in "cards.rkt" card?)
-         "basics.rkt"
-         "common.rkt" json)
+(require "../next.rkt" "../internal-external.rkt"
+         (except-in "../cards.rkt" card?)
+         "../basics.rkt"
+         "../common.rkt"
+         json)
 
 (module+ test
-  (require "board.rkt" "traits.rkt" (submod "..") (submod "common.rkt" test) rackunit))
+  (require (submod "..") "../board.rkt" "../traits.rkt" (submod "../common.rkt" test) rackunit))
 
 ;; ===================================================================================================
 ;; IMPLEMENTATION

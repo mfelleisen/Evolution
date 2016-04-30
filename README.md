@@ -23,7 +23,7 @@ TOOD
 5. put json-> for test harnesses in proper place (test modules)
 6. name proxy-server and proxy-player properly 
 7. re-think the case when a player cannot eat now, but later when a "victim" becomes available 
-8. move distributed part to subdirectory 
+-. move distributed part to subdirectory 
 9. document JSON in this subdirectory's README 
 
 Files, Modules and Dependencies 
@@ -55,6 +55,8 @@ Files, Modules and Dependencies
 | 		    | 	       	   	      						 |
 | xmain 	    | an executable for running a sequential game for n players		 |
 | 		    | 	       	   	      						 |
+| ----------------- | ------------------------------------------------------------------ |
+| Xternal	    | directory for playing in distributed mode 			 |
 | xdist 	    | an executable for running a distributed game for n players	 |
 | xclients 	    | an executable for running a bunch of clients in threads 		 |
 | xserver 	    | an executable for running server	   	      			 |

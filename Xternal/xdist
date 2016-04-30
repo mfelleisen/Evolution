@@ -10,7 +10,7 @@ exec racket -tm "$0" ${1+"$@"}
 
 ;; EXTERNAL SERVICES
 
-(require (only-in "dealer.rkt" MAX-PLAYERS MIN-PLAYERS) "basics.rkt")
+(require (only-in "../dealer.rkt" MAX-PLAYERS MIN-PLAYERS) "../basics.rkt")
 
 (provide
   (contract-out

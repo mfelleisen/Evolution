@@ -9,7 +9,7 @@ exec racket -W info -tm "$0" ${1+"$@"}
 
 ;; EXTERNAL SERVICES
 
-(require (only-in "basics.rkt" valid-port/c) (only-in "dealer.rkt" MAX-PLAYERS MIN-PLAYERS))
+(require (only-in "../basics.rkt" valid-port/c) (only-in "../dealer.rkt" MAX-PLAYERS MIN-PLAYERS))
 
 (provide 
  (contract-out
@@ -24,9 +24,9 @@ exec racket -W info -tm "$0" ${1+"$@"}
 ;; ===================================================================================================
 ;; DEPENDENCIES
 
-(require (rename-in "proxy-client.rkt" [main create-client])
-         (except-in "basics.rkt" valid-port/c)
-         "common.rkt")
+(require (rename-in "client.rkt" [main create-client])
+         (except-in "../basics.rkt" valid-port/c)
+         "../common.rkt")
 
 ;; ===================================================================================================
 ;; IMPLEMENTATION

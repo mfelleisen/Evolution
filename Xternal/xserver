@@ -9,7 +9,7 @@ exec racket -W info -tm "$0" ${1+"$@"}
 
 ;; EXTERNAL SERVICES
 
-(require (only-in "basics.rkt" valid-port/c))
+(require (only-in "../basics.rkt" valid-port/c))
 
 (define WAIT-FOR 10)
 
@@ -27,11 +27,11 @@ exec racket -W info -tm "$0" ${1+"$@"}
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
-(require "gui.rkt" "dealer.rkt" "proxy-player.rkt" "common.rkt" json)
+(require "../gui.rkt" "../dealer.rkt" "proxy-player.rkt" "../common.rkt" json)
 
 (module+ test
-  (require [rename-in "proxy-client.rkt" [main create-client]]
-           [rename-in "xmain" [main sequential]] rackunit))
+  (require [rename-in "client.rkt" [main create-client]]
+           [rename-in "../xmain" [main sequential]] rackunit))
 
 ;; ===================================================================================================
 ;; IMPLEMENTATION
