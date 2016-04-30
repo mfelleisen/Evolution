@@ -24,11 +24,6 @@
  ;; [Setof Card] -> Boolean 
  subset-of-all-cards?
  
- (contract-out
-  [card->image
-   ;; render the current card as an image 
-   (-> valid-card? image?)])
- 
  ;; JSexpr -> Card
  json->card
  
@@ -38,7 +33,7 @@
 ;; ===================================================================================================
 ;; DEPENDENCIES
 
-(require "traits.rkt" "basics.rkt" 2htdp/image)
+(require "traits.rkt")
 
 (module+ test
   (require rackunit))
@@ -107,30 +102,3 @@
        [(member candidate all-cards) => first]
        [else (error 'json->card "~e does not specify an Evolution card")])]))
 
-;; ---------------------------------------------------------------------------------------------------
-;; render cards as images 
-
-(define food-front-color  'red)
-(define food-back-color   'gray)
-
-(define all-card-images
-  (local ((define all-food-p-img
-            (for/list ((c all-cards))
-              (text (number->string (card-food-points c)) TEXT-SIZE food-front-color)))
-          (define fp-width (+ 10 (apply max (map image-width all-food-p-img))))
-          (define fp-box (rectangle fp-width TEXT-SIZE 'solid food-back-color))
-          
-          (define (card->image card fp-img)
-            (define fp (overlay/align 'right 'center fp-img fp-box))
-            (cons card (beside (trait->img (card-trait card)) fp))))
-    (map card->image all-cards all-food-p-img)))
-
-(define (card->image c)
-  (cdr (assq c all-card-images)))
-
-(module+ test 
-  (card->image (list-ref all-cards (random (length all-cards))))
-  (card->image (list-ref all-cards (random (length all-cards))))
-  (card->image (list-ref all-cards (random (length all-cards))))
-  (card->image (list-ref all-cards (random (length all-cards))))
-  (card->image (list-ref all-cards (random (length all-cards)))))

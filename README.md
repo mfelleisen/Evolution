@@ -18,8 +18,7 @@ TO DO
 
 1. clean up basic
 2. clean up common
-3. clean up add a description of communication between pieces 
-4. bring back gui in xserver 
+4. bring back gui in xmain and xserver 
 5. put json-> for test harnesses in proper place (test modules)
 7. re-think the case when a player cannot eat now, but later when a "victim" becomes available 
 9. document JSON in this subdirectory's README 

@@ -17,13 +17,6 @@
  ;; JSExpr -> Trait
  json->trait
  
- (contract-out
-  ;; render this trait as an image 
-  [trait->img (-> trait? image?)])
-
- ;; Image
- empty-trait
-
  ;; Trait
  carnivore
  attack-traits       ;; [Listof Trait]
@@ -47,7 +40,6 @@
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
-(require "basics.rkt" 2htdp/image)
 
 (module+ test
   (require rackunit))
@@ -59,9 +51,9 @@
 
 ;; (define-traits n:id t1:id ... tn:id)
 ;; creates the traits t1 through tn and also collects them a list, which is then named n
-;; effect: remember the new traits in *rendering 
+;; EFFECT remember the new traits in *rendering 
 
-(define *rendering '())
+(define *trait-x-string-representation '())
 
 (define-syntax (define-traits stx)
   (syntax-case stx ()
@@ -73,7 +65,8 @@
              (let ()
                (struct n ())
                (define x (n))
-               (set! *rendering (cons `(,x ,(symbol->string 'n)) *rendering))
+               (set! *trait-x-string-representation
+                     (cons `(,x ,(symbol->string 'n)) *trait-x-string-representation))
                (values x n?)))
            ...
            (define name (list n ...))))]))
@@ -92,11 +85,11 @@
   (check-equal? (json->trait (trait->json tester)) tester))
 
 (define (trait->json x)
-  (define r (assq x *rendering))
+  (define r (assq x *trait-x-string-representation))
   (if r (second r) (error 'trait->json "~e" x)))
 
 (define (json->trait j)
-  (define r (argmax (lambda (x) (if (string=? (second x) j) 1 0)) *rendering))
+  (define r (argmax (lambda (x) (if (string=? (second x) j) 1 0)) *trait-x-string-representation))
   (if r (first r) (error 'json->trait "~e" j)))
 
 ;; ---------------------------------------------------------------------------------------------------
@@ -132,26 +125,3 @@
 (define (<-trait t1 t2)
   (string<? (trait->json t1) (trait->json t2)))
 
-;; ---------------------------------------------------------------------------------------------------
-;; render traits as images 
-(define trait-front-color 'black)
-(define trait-back-color  'pink)
-
-(define all-trait-images
-  (local ((define all-traits-img
-            (for/list ((t *rendering))
-              (cons (first t) (text (second t) TEXT-SIZE trait-front-color))))
-          (define trait-width (+ 10 (apply max (map (compose image-width cdr) all-traits-img))))
-          (define trait-box (rectangle trait-width TEXT-SIZE 'solid trait-back-color)))
-    (for/list ((t all-traits-img))
-      (cons (car t) (overlay/align 'left 'center (cdr t) trait-box)))))
-
-(define a-trait-image (cdr (first all-trait-images)))
-(define empty-trait
-  (rectangle (image-width a-trait-image) (image-height a-trait-image) 'solid 'white))
-
-(define (trait->img t)
-  (cdr (assq t all-trait-images)))
-
-(module+ test
-  (trait->img (first (list-ref *rendering (random (length *rendering))))))

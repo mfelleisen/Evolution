@@ -5,39 +5,6 @@
 
 ;; =============================================================================
 ;; basic constants for rendering text 
-(provide
- TEXT-SIZE
- blank
- 
- boxed
- 
- label->img
- label->box 
- 
- attr->img)
-
-(require 2htdp/image)
-
-(define blank (square 3 'solid 'white))
-
-(define TEXT-SIZE 16)
-
-(define attr-color 'black)
-(define label-color 'black)
-
-(define (attr->img a)
-  (text (number->string a) TEXT-SIZE attr-color))
-
-(define (label->img l)
-  (text l TEXT-SIZE label-color))
-
-(define (label->box s)
-  (rectangle (+ 10 (image-width (label->img s))) TEXT-SIZE 'solid 'lime))
-
-(define (boxed label image (align 'center))
-  (define bx (rectangle (image-width image) TEXT-SIZE 'solid 'lime))
-  (define tx (if (string? label) (text label TEXT-SIZE 'black) label))
-  (overlay/align align 'center tx bx))
 
 ;; =============================================================================
 (provide
