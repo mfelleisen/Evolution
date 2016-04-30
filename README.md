@@ -22,6 +22,9 @@ TOOD
 4. bring back gui in xserver 
 5. put json-> for test harnesses in proper place (test modules)
 6. name proxy-server and proxy-player properly 
+7. re-think the case when a player cannot eat now, but later when a "victim" becomes available 
+8. move distributed part to subdirectory 
+9. document JSON in this subdirectory's README 
 
 Files, Modules and Dependencies 
 -------------------------------
