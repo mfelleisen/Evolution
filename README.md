@@ -55,12 +55,7 @@ Files, Modules and Dependencies
 | 		    | 	       	   	      						 |
 | xmain 	    | an executable for running a sequential game for n players		 |
 | 		    | 	       	   	      						 |
-| ----------------- | ------------------------------------------------------------------ |
 | Xternal	    | directory for playing in distributed mode 			 |
-| xdist 	    | an executable for running a distributed game for n players	 |
-| xclients 	    | an executable for running a bunch of clients in threads 		 |
-| xserver 	    | an executable for running server	   	      			 |
-
 
 Compiling 
 ---------
