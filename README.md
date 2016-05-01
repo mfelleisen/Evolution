@@ -1,10 +1,13 @@
 # Evolution
 
-This repo represents my implementation of the Evolution game for [Software Development @
-NU CCIS S'2016](http://www.ccs.neu.edu/home/matthias/4500-s16/). The course did not use
-the official rules of the game but a [simplified and modified
+This repo is the core of my implementation of the Evolution game for [Software Development @
+NU CCIS S'2016](http://www.ccs.neu.edu/home/matthias/4500-s16/). It does not include the
+test harnesses and the test-generating pieces. 
+
+The course did not use the official rules of the game but a [simplified and modified
 version](http://www.ccs.neu.edu/home/matthias/4500-s16/evolution.html) [also see the
-students' frequently asked question and my answers](http://www.ccs.neu.edu/home/matthias/4500-s16/faq.html).
+students' frequently asked question and my
+answers](http://www.ccs.neu.edu/home/matthias/4500-s16/faq.html).
 
 The Evolution game is run as a series of turns, with almost no setup
 required. Each turn proceeds in four stages:
@@ -62,11 +65,16 @@ Files, Modules and Dependencies
 | basics     	    | functions, contracts, syntax that could come from Racket		 |
 | 		    | 	       	   	      						 |
 | xmain 	    | an executable for running a sequential game for n players		 |
-| 		    | 	       	   	      						 |
-| Xternal	    | directory for playing in distributed mode 			 |
-| 		    | 	       	   	      						 |
+
+| name              | purpose                                                            |
+| ----------------- | ------------------------------------------------------------------ |
 | common     	    | some project-cross-cutting things					 |
 | json-pretty       | this must go to json library					 |
+
+| name              | purpose                                                            |
+| ----------------- | ------------------------------------------------------------------ |
+| Xternal	    | directory for playing in distributed mode 			 |
+
 
 Reading the Code (in General)
 -----------------------------
