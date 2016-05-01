@@ -6,7 +6,21 @@ the official rules of the game but a [simplified and modified
 version](http://www.ccs.neu.edu/home/matthias/4500-s16/evolution.html) [also see the
 students' frequently asked question and my answers](http://www.ccs.neu.edu/home/matthias/4500-s16/faq.html).
 
-The implementation supports both a sequential implementation that integrates Racket-based
+The Evolution game is run as a series of turns, with almost no setup
+required. Each turn proceeds in four stages:
+1. the dealer ensures that every player has one species board and cards to play with 
+2. the players pick one card to contribute to the common food supply 
+3. they use (some of) their other cards to perform actions on their species boards
+4. finally they feed their species. 
+The clean-up phase consolidates the players' gains and awards cards for
+lost species boards. 
+
+The dealer communicates with the players and enforces the rules. The
+implementation of a turn consists of three steps: the dealer starts each
+player, then asks for card actions, and finally runs a feeding cycle,
+asking each player what to feed next. 
+
+This implementation supports both a sequential implementation that integrates Racket-based
 player implementations statically and a distributed implementation for interacting with
 players implemented in other languages.
 
@@ -22,6 +36,9 @@ TO DO
 7. re-think the case when a player cannot eat now, but later when a "victim" becomes available 
 9. document JSON in this subdirectory's README 
 A. add xdist-bad-clients to test error handling 
+B. decouple printing from main & dealer so that it becomes easier to develop a benchmark
+C. submit json-pretty to racket/json 
+
 
 Files, Modules and Dependencies 
 -------------------------------
@@ -29,10 +46,10 @@ Files, Modules and Dependencies
 | name              | purpose                                                            |
 | ----------------- | ------------------------------------------------------------------ |
 |
-[spec-relations](https://github.com/mfelleisen/Evolution/blob/master/spec-relations.txt) | what kind of objects exist and how are they related and how they interact|
+[doc-relations](https://github.com/mfelleisen/Evolution/blob/master/doc-relations.txt) | what kind of objects exist and how are they related and how they interact|
 |           	    | 	     		       		     	  			 |
 | dealer	    | dealer data representation and functionality			 |
-| [player-implementation.txt](https://github.com/mfelleisen/Evolution/blob/master/player-implementation.txt) | a diagram ow how the following three files are related     |
+| [doc-players.txt](https://github.com/mfelleisen/Evolution/blob/master/doc-players.txt) | a diagram ow how the following three files are related     |
 | player-base       | basic player data and functionality				 |
 | player-external   | a representation of a specific "silly" external player		 |
 | player-internal   | a representation of the internal player with index-based API  	 |
@@ -51,10 +68,10 @@ Files, Modules and Dependencies
 | common     	    | some project-cross-cutting things					 |
 | json-pretty       | this must go to json library					 |
 
-Reading the Code 
-----------------
+Reading the Code (in General)
+-----------------------------
 
-All files consist of three (or more) segments: 
+All code files consist of three segments: 
 
 1. an interface, which specifies the exported services;
 2. require dependencies for the code proper and the unit tests;
@@ -67,6 +84,21 @@ Most module come with a fourth section:
 
 To read any file, open it in DrRacket. We strongly recommend reading the
 program from the top down, starting with the provide specs. 
+
+Reading this Code (Specifically)
+--------------------------------
+
+Make sure to read the rules of Evolution and the FAQ. 
+
+Start with doc-relations.txt. The file provides an overview of the key
+pieces: the dealer, its representation of players, the external players
+(mostly strategies), and the communication layer between them. 
+
+Now scan sections 1 of next.rkt, dealer.rkt, and player-external.rkt. 
+These interfaces explain the communication layer. 
+
+The doc-players.txt files comes next. The file lays out how the player
+infrastructure is arranged.
 
 Compiling 
 ---------

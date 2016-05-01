@@ -1,7 +1,11 @@
 #lang racket
 
 ;; ===================================================================================================
-;; the ontology between dealer and external player for start, choose, and feed-next interactions
+;; the ontology between dealer and external player for
+;; -- start,
+;; -- choose, and
+;; -- feed-next
+;; interactions
 
 ;; EXTERNAL SERVICES
 
