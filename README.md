@@ -73,7 +73,7 @@ The Distributed Version
 
 | name              | purpose                                                            |
 | ----------------- | ------------------------------------------------------------------ |
-| Xternal	    | directory for playing in distributed mode 			 |
+| [Xternal](https://github.com/mfelleisen/Evolution/tree/master/Xternal) | directory for playing in distributed mode 			 |
 
 Files to Migrate (into the Racket repo)
 ---------------------------------------
