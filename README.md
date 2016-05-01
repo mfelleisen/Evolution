@@ -37,7 +37,7 @@ Files, Modules and Dependencies
 | player-external   | a representation of a specific "silly" external player		 |
 | player-internal   | a representation of the internal player with index-based API  	 |
 | internal-external | functions & syntax for communicating between X and I players  	 |
-| next    	    | a data representation of feed-next responses 			 |
+| next    	    | a representation of dealer-player dialogues 			 |
 | board 	    | a data representation of species boards          			 |
 | traits  	    | a data representation of traits         				 |
 | cards   	    | a data representation of cards          				 |
@@ -50,39 +50,6 @@ Files, Modules and Dependencies
 | 		    | 	       	   	      						 |
 | common     	    | some project-cross-cutting things					 |
 | json-pretty       | this must go to json library					 |
-
-Compiling 
----------
-
-Use raco to compile the clients:
-
-> raco make xmain
-
-> raco make xclients 
-
-> raco make xserver
-
-> raco make xdist 
-
-Compiling is optional in Racket. It reduces the start-up cost.
-
-Testing
--------
-
-Use raco to run the unit tests, e.g., 
-
-> raco test dealer.rkt 
-
-Running the Distributed Version
--------------------------------
-
-Open two shells, in the first run: 
-> ./xproxy-server 45678 
-
-in the second one, run 
-> ./xclients 3 ""
-
-This will run one complete game on local host.
 
 Reading the Code 
 ----------------
@@ -100,3 +67,24 @@ Most module come with a fourth section:
 
 To read any file, open it in DrRacket. We strongly recommend reading the
 program from the top down, starting with the provide specs. 
+
+Compiling 
+---------
+
+Use raco to compile the clients:
+
+> raco make xmain
+
+Compiling is optional in Racket. It reduces the start-up cost.
+
+Testing
+-------
+
+Use raco to run the unit tests, e.g., 
+
+> raco test dealer.rkt 
+
+> ./xmain 8
+
+See all 1s. 
+
