@@ -63,18 +63,24 @@ Files, Modules and Dependencies
 | cards   	    | a data representation of cards          				 |
 | gui     	    | a gui mixin for displaying 2htdp/images 				 |
 | basics     	    | functions, contracts, syntax that could come from Racket		 |
+| common     	    | some project-cross-cutting things					 |
 | 		    | 	       	   	      						 |
 | xmain 	    | an executable for running a sequential game for n players		 |
 
-| name              | purpose                                                            |
-| ----------------- | ------------------------------------------------------------------ |
-| common     	    | some project-cross-cutting things					 |
-| json-pretty       | this must go to json library					 |
+
+The Distributed Version
+-----------------------
 
 | name              | purpose                                                            |
 | ----------------- | ------------------------------------------------------------------ |
 | Xternal	    | directory for playing in distributed mode 			 |
 
+Files to Migrate (into the Racket repo)
+---------------------------------------
+
+| name              | purpose                                                            |
+| ----------------- | ------------------------------------------------------------------ |
+| json-pretty       | this must go to json library					 |
 
 Reading the Code (in General)
 -----------------------------
