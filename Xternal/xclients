@@ -24,7 +24,10 @@ exec racket -W info -tm "$0" ${1+"$@"}
 ;; ===================================================================================================
 ;; DEPENDENCIES
 
-(require (rename-in "client.rkt" [main create-client]) "../common.rkt")
+(require (rename-in "client.rkt" [main create-client]) "messaging.rkt")
+
+;; for debugging
+(require "../common.rkt")
 
 ;; ===================================================================================================
 ;; IMPLEMENTATION

@@ -25,7 +25,10 @@
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
-(require "../player-external.rkt" "../board.rkt" "../cards.rkt" "../common.rkt" "../basics.rkt" json)
+
+(require "messaging.rkt" "../player-external.rkt" "../board.rkt" "../cards.rkt"  "../basics.rkt" json)
+
+(require "../common.rkt")
 
 (module+ test
   (require (submod "..") "../traits.rkt" (submod "../common.rkt" test) json rackunit))
@@ -96,7 +99,7 @@
     (define/public (run-game)
       (parameterize ([current-input-port in] [current-output-port out])
         (send-message sign-up)
-        (define ok (read-json in))
+        (define ok (read-json in)) ;; <-- do not impose time-out with read-message
         (define/fsm start
           (state: start     json->start  void                          --> choose)
           (state: choose    json->choose (compose send-message values) --> feed-next)

@@ -79,9 +79,12 @@ exec racket -tm "$0" ${1+"$@"}
  [create-external   (-> Any)])
 
 (require/typed
- "../common.rkt"
+ "messaging.rkt"
  [LOCALHOST String]
- [REMOTE-PORT Natural]
+ [REMOTE-PORT Natural])
+
+(require/typed
+ "../common.rkt"
  [debug (-> Any Any)])
 
 ;; ===================================================================================================

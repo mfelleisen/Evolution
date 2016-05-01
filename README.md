@@ -52,7 +52,7 @@ Files, Modules and Dependencies
 [doc-relations](https://github.com/mfelleisen/Evolution/blob/master/doc-relations.txt) | what kind of objects exist and how are they related and how they interact|
 |           	    | 	     		       		     	  			 |
 | dealer	    | dealer data representation and functionality			 |
-| [doc-players.txt](https://github.com/mfelleisen/Evolution/blob/master/doc-players.txt) | a diagram ow how the following three files are related     |
+| [doc-players](https://github.com/mfelleisen/Evolution/blob/master/doc-players.txt) | a diagram ow how the following three files are related     |
 | player-base       | basic player data and functionality				 |
 | player-external   | a representation of a specific "silly" external player		 |
 | player-internal   | a representation of the internal player with index-based API  	 |

@@ -25,7 +25,10 @@ exec racket -W info -tm "$0" ${1+"$@"}
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
-(require "../gui.rkt" "../dealer.rkt" "proxy-player.rkt" "../common.rkt" json)
+(require "messaging.rkt" "../gui.rkt" "../dealer.rkt" "proxy-player.rkt" json)
+
+;; for debugging 
+(require "../common.rkt")
 
 (module+ test
   (require [rename-in "client.rkt" [main create-client]]

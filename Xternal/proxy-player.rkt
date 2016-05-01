@@ -20,11 +20,14 @@
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
-(require "../next.rkt" "../internal-external.rkt"
+(require (except-in "../next.rkt" external-player/c)
          (except-in "../cards.rkt" card?)
          "../basics.rkt"
-         "../common.rkt"
+         "messaging.rkt"
          json)
+
+;; for debugging 
+(require "../common.rkt")
 
 (module+ test
   (require (submod "..") "../board.rkt" "../traits.rkt" (submod "../common.rkt" test) rackunit))
