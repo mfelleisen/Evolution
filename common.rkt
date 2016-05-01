@@ -1,5 +1,16 @@
 #lang racket 
 
+;; -----------------------------------------------------------------------------
+(provide
+ debug)
+
+;; (define *debug (open-output-file "/dev/tty" #:exists 'append))
+(define *debug (current-error-port))
+
+(define (debug x)
+  (displayln x *debug)
+  x)
+
 (require json)
 
 ;; -----------------------------------------------------------------------------
@@ -7,17 +18,9 @@
   
   ;; ---------------------------------------------------------------------------
   (provide
-   #;
-   (case->
-    (-> Boolean Void)
-    (-> Boolean))
    ;; parameter: should tests be writte out?
    write-out-tests
-   
-   #;
-   (case->
-    (-> (-> String String) Void)
-    (-> (-> String String)))
+
    ;; parameter: the function to be tested
    testing
    
@@ -28,8 +31,6 @@
    run-write-json-test
    
    ;; type ToJson
-   #;
-   [Maybe (Class (to-json (-> Any JSexpr)))]
    ;; ToJson ToJson ToJson ToJson String -> Void
    ;; (run-write-json-test2 x y z w  msg) runs (testing)
    ;; on x y z w, compares its output with expected; report msg
@@ -49,9 +50,7 @@
    make-test
    
    write-test-case
-   add-test-input
-   
-   to-json*)
+   add-test-input)
   
   ;; ---------------------------------------------------------------------------
   (require rackunit)
@@ -147,14 +146,3 @@
   (define (write-test-part fmt txt)
     (define fname (format fmt *test-case))
     (with-output-to-file fname #:exists 'replace (lambda () (displayln txt)))))
-
-;; -----------------------------------------------------------------------------
-(provide
- debug)
-
-;; (define *debug (open-output-file "/dev/tty" #:exists 'append))
-(define *debug (current-error-port))
-
-(define (debug x)
-  (displayln x *debug)
-  x)
