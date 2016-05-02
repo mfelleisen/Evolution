@@ -13,6 +13,7 @@ Files, Modules and Dependencies
 | name              | purpose                                                            |
 | ----------------- | ------------------------------------------------------------------ |
 | gui     	    | a gui mixin for displaying 2htdp/images 				 |	
+| observer     	    | set up observer connection between dealer and players		 |
 | 		    | 	    	      		 					 |
 | proxy-player 	    | a proxy player for the server to connect to remote clients 	 |
 | proxy-dealer 	    | a proxy dealer for the client to connect to remote servers    	 |
