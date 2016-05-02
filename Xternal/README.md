@@ -1,10 +1,18 @@
 # Evolution, the distributed part 
 
+TO DO
+-----
+
+4. bring back gui in xmain and xserver 
+
+
 Files, Modules and Dependencies 
 -------------------------------
 
 | name              | purpose                                                            |
 | ----------------- | ------------------------------------------------------------------ |
+| gui     	    | a gui mixin for displaying 2htdp/images 				 |	
+| 		    | 	    	      		 					 |
 | proxy-player 	    | a proxy player for the server to connect to remote clients 	 |
 | proxy-dealer 	    | a proxy dealer for the client to connect to remote servers    	 |
 | proxy-json-tests  | a unit test suite for relation json-> and ->json functions	 |

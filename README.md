@@ -33,7 +33,6 @@ between 3 and 8.
 TO DO
 -----
 
-4. bring back gui in xmain and xserver 
 5. put json-> for test harnesses in proper place (test modules)
 7. re-think the case when a player cannot eat now, but later when a "victim" becomes available 
 9. document JSON in this subdirectory's README 
@@ -60,7 +59,6 @@ Files, Modules and Dependencies
 | board 	    | a data representation of species boards          			 |
 | traits  	    | a data representation of traits         				 |
 | cards   	    | a data representation of cards          				 |
-| gui     	    | a gui mixin for displaying 2htdp/images 				 |
 | basics     	    | functions, contracts, syntax that could come from Racket		 |
 | common     	    | some project-cross-cutting things					 |
 | 		    | 	       	   	      						 |
