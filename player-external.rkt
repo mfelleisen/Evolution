@@ -345,15 +345,7 @@
   ;; -------------------------------------------------------------------------------------------------
   (define (attacker1 2traits)
     (species #:body 3 #:food 2 #:population 4 #:traits `(,carnivore ,@2traits)))
-  
-  ;; -------------------------------------------------------------------------------------------------
-  (check-equal? (json->species (send (attacker1 '()) to-json)) (attacker1 '())
-                "json->species is left-inverse for to-json")
-  
-  (define s0 (species #:fat-food 2 #:body 2 #:traits `(,fat-tissue)))
-  (check-equal? (json->species (send s0 to-json)) s0
-                "json->species is left-inverse for to-json, with fat food")
-  
+
   ;; -------------------------------------------------------------------------------------------------
   (define att-plain (attacker1 '()))
   

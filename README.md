@@ -36,7 +36,6 @@ TO DO
 5. put json-> for test harnesses in proper place (test modules)
 7. re-think the case when a player cannot eat now, but later when a "victim" becomes available 
 11. decouple printing from main & dealer so that it becomes easier to develop a benchmark
-12. submit json-pretty to racket/json 
 
 Files, Modules and Dependencies 
 -------------------------------
@@ -74,7 +73,7 @@ Files to Migrate (into the Racket repo)
 
 | name              | purpose                                                            |
 | ----------------- | ------------------------------------------------------------------ |
-| json-pretty       | this must go to json library					 |
+| ToRacket/json-pretty | this must go to json library					 |
 
 Reading the Code (in General)
 -----------------------------

@@ -8,32 +8,39 @@
 (require (only-in "player-internal.rkt" internal-player/c)
          (only-in "next.rkt" dealer-next/c  external-player/c)
          (only-in "cards.rkt" card?)
-         (only-in "basics.rkt" natural? between)
-         "observer.rkt"
-         json)
+         (only-in "basics.rkt" natural? between))
+
+(define dealer%/c
+  (class/c
+   [field players watering-hole cards]
+   [inner (complete-turn (->m any))]))
+
+;; add the interface of the dealer for external uses (xmain) 
+(define dealer/c (and/c (object/c [run-game (->m any/c)]) dealer-next/c))
 
 (define MIN-PLAYERS 3)
 (define MAX-PLAYERS 8)
 
-;; the interface of the dealer for external uses (xmain, xserver, etc) 
-(define dealer-proper/c
-  (object/c
-   [register-observer (->m observer/c any)]
-   [run-game (->m any/c)]))
-
-;; the full interface 
-(define dealer/c (and/c dealer-proper/c dealer-next/c))
+(define (create-dealer/c dealer/c)
+  (->* [(and/c [listof (list/c string? external-player/c)] (between MIN-PLAYERS MAX-PLAYERS))]
+       [(listof card?)]
+       dealer/c))
 
 (provide
  ;; constants 
  MIN-PLAYERS
  MAX-PLAYERS
- 
+
+ create-dealer/c ;; DealerContract -> CreatorContract 
+ dealer/c        ;; DealerContract 
+
  (contract-out
+  [dealer%
+   ;; for inheritance in xdealer
+   dealer%/c]
   [create-dealer
    ;; expects a list of named (string) players that satisfy the external player interface
-   (->* [(and/c [listof (list/c string? external-player/c)] (between MIN-PLAYERS MAX-PLAYERS))]
-        dealer/c)]))
+   (create-dealer/c dealer/c)]))
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
@@ -58,26 +65,27 @@
 ;; ===================================================================================================
 ;; IMPLEMENTATION
 
-(define (create-dealer players)
-  (new dealer% [externals players][cards #;shuffle all-cards]))
+(define (create-dealer players (cards all-cards))
+  (new dealer% [externals players][cards cards]))
 
-(define/contract (dealer #:cards [cards '()] 
-                         #:players players
-                         #:watering [watering-hole 0])
-  (->i (#:players  [players (and/c [listof any/c #;player?] (between MIN-PLAYERS MAX-PLAYERS))])
-       (#:cards    [cards [listof valid-card?]]
-        #:watering [watering-hole natural-number/c])
-       #:pre (cards players)
-       (let* ([player-cards  (apply append (map (lambda (p) (get-field cards p)) players))]
-              [dealer-cards  (if (unsupplied-arg? cards) '() cards)]
-              [cards-as-set  (to-set (append dealer-cards player-cards))])
-         (and cards-as-set (subset-of-all-cards? cards-as-set)))
-       [r any/c #;==dealer%])
-  (define-syntax-rule (set food) (set-field! food s food))
-  (define s (new dealer% [cards cards]))
-  (set players)
-  (set watering-hole)
-  s)
+(module+ test
+  (define/contract (dealer #:cards [cards '()] 
+                           #:players players
+                           #:watering [watering-hole 0])
+    (->i (#:players  [players (and/c [listof any/c #;player?] (between MIN-PLAYERS MAX-PLAYERS))])
+         (#:cards    [cards [listof valid-card?]]
+          #:watering [watering-hole natural-number/c])
+         #:pre (cards players)
+         (let* ([player-cards  (apply append (map (lambda (p) (get-field cards p)) players))]
+                [dealer-cards  (if (unsupplied-arg? cards) '() cards)]
+                [cards-as-set  (to-set (append dealer-cards player-cards))])
+           (and cards-as-set (subset-of-all-cards? cards-as-set)))
+         [r any/c #;==dealer%])
+    (define-syntax-rule (set food) (set-field! food s food))
+    (define s (new dealer% [cards cards]))
+    (set players)
+    (set watering-hole)
+    s))
 
 ;; ---------------------------------------------------------------------------------------------------
 
@@ -122,24 +130,6 @@
       (hash-code players))
     
     ;; -----------------------------------------------------------------------------------------------
-    (define *observers '[])
-
-    (define/public (register-observer o)
-      (set! *observers (cons o *observers)))
-
-    (define/private (call-observers)
-      (for ((o *observers))
-        (define j (to-json))
-        (send o display j)
-        (sleep 10)))
-
-    ;; -----------------------------------------------------------------------------------------------
-    ;; serialization
-
-    (define/public (to-json)
-      `(,(map (lambda (p) (send p to-json)) players) ,watering-hole ,(map card->json cards)))
-    
-    ;; -----------------------------------------------------------------------------------------------
     ;; running a game
     
     ;; Step4   = [Listof Action4]           ; the actions all players wish to perform 
@@ -151,11 +141,7 @@
     (define/public (run-game)
       (let run-turns ()
         (unless (over?)
-          (call-observers)
-          (boards-for-all)
-          (turn)
-          (when (member 'display (interface->method-names (object-interface this)))
-            (send this display))
+          (complete-turn)
           (unless (empty? players)
             (set! players (cyclic-rotate players))
             (run-turns))))
@@ -164,6 +150,13 @@
       (for ((r (results)) (i (in-naturals)))
         (match-define `(,id ,s) r)
         (printf "~a player id: ~a score: ~a\n" (+ i 1) id s)))
+    
+    (define/pubment (complete-turn)
+      (inner (void) complete-turn)
+      (boards-for-all)
+      (turn)
+      (when (member 'display (interface->method-names (object-interface this)))
+        (send this display)))
     
     ;; -> Void
     ;; EFFECT add one board to all players that don't have one
@@ -425,7 +418,6 @@
   ;; and that the feeding reduces the food tokens at the watering hole as expected
   (define (check-plain msg cards pre post . players)
     (define dealer0 (dealer #:players players #:cards cards #:watering pre))
-    (define pre-dealer-json (send dealer0 to-json))
     (with-handlers ([exn:fail:contract? (lambda (x) (debug `("contract:" ,msg)) (raise x))])
       (check-equal? (begin [(testing) dealer0] (get-field watering-hole dealer0)) post msg)))
   
@@ -456,13 +448,7 @@
                                 #:external create-external
                                 #:cards cards
                                 #:species #,species))
-                    (define chk-msg
-                      #`(format "~a (difference in player ~a)\nactual: ~a\nexpect: ~a\n"
-                                #,msg
-                                #,id
-                                (send q to-json)
-                                (send #,the-plr to-json)))
-                    #`(check-equal? q #,the-plr #,chk-msg))])))])))
+                    #`(check-equal? q #,the-plr #,msg #;#,chk-msg))])))])))
   
   ;; [Listof Expr] [Listof (U - _ Expr)] -> [Listof Expr]
   ;; construct the expected list of species 

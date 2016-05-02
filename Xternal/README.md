@@ -7,7 +7,6 @@ TO DO
 9. document JSON in this subdirectory's README 
 10. add xdist-bad-clients to test error handling 
 
-
 Files, Modules and Dependencies 
 -------------------------------
 

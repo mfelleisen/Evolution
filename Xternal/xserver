@@ -25,7 +25,7 @@ exec racket -W info -tm "$0" ${1+"$@"}
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
-(require "messaging.rkt" "../gui.rkt" "../dealer.rkt" "proxy-player.rkt" json)
+(require "messaging.rkt" "gui.rkt" "dealer.rkt" "proxy-player.rkt" json)
 
 ;; for debugging 
 (require "../common.rkt")
