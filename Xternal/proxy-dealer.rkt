@@ -218,4 +218,26 @@
       ;; feed-next
       ,(append (start1 0) '(1 ()))))
   
-  (run-json-exn-testing "checking exn behavior for start -> feed-next" in2 exn:fail:contract?))
+  (run-json-exn-testing "checking exn behavior for start -> feed-next" in2 exn:fail:contract?)
+
+  ;; -------------------------------------------------------------------------------------------------
+  (define in3
+    `(,OK
+      ,(start1 0)
+      ;; choose: arguments ignored 
+      [ () () ]
+      ;; feed-next
+      ,(append (rest (start1 0)) '(1 0))
+      ;; choose, again
+      [ () () ]))
+
+  (run-json-exn-testing "checking exn behavior for feed-next -> choose" in3 exn:fail:contract?)
+
+  ;; -------------------------------------------------------------------------------------------------
+  (define in4
+    `(,OK
+      ;; no start
+      ;; choose: arguments are ignored 
+      [ () () ]))
+
+  (run-json-exn-testing "checking exn behavior for no start" in3 exn:fail:contract?))
