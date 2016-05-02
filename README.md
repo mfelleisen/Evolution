@@ -33,7 +33,6 @@ between 3 and 8.
 TO DO
 -----
 
-2. clean up common
 4. bring back gui in xmain and xserver 
 5. put json-> for test harnesses in proper place (test modules)
 7. re-think the case when a player cannot eat now, but later when a "victim" becomes available 

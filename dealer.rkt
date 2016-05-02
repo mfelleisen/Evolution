@@ -29,9 +29,6 @@
  MIN-PLAYERS
  MAX-PLAYERS
  
- ;; JSexpr -> Dealer
- json->dealer
- 
  (contract-out
   [create-dealer
    ;; expects a list of named (string) players that satisfy the external player interface
@@ -41,8 +38,7 @@
 ;; ===================================================================================================
 ;; DEPENDENCIES
 
-(require (only-in "player-external.rkt" json->player)
-         (only-in "player-internal.rkt" create-player CARDS-PER-BOARD CARD-PER-PLAYER)
+(require (only-in "player-internal.rkt" create-player CARDS-PER-BOARD CARD-PER-PLAYER)
          (except-in "cards.rkt" card?) 
          (except-in "basics.rkt" natural? between)
          (except-in "next.rkt" dealer-next/c)
@@ -53,8 +49,7 @@
 
 (module+ test
   (require rackunit
-           (only-in "player-external.rkt"
-                    create-external action4->json create-bad-choose no-fc over-growth)
+           (only-in "player-external.rkt" create-external create-bad-choose no-fc over-growth)
            (only-in (submod "player-internal.rkt" test) player)
            (submod ".."))
   (require (for-syntax syntax/parse))
@@ -83,13 +78,6 @@
   (set players)
   (set watering-hole)
   s)
-
-(define (json->dealer j)
-  (match j
-    [`((,player* ...) ,(? natural? watering-hole) (,card* ...))
-     (define players (map json->player player*))
-     (define cards (map json->card card*))
-     (dealer #:cards cards #:players players #:watering watering-hole)]))
 
 ;; ---------------------------------------------------------------------------------------------------
 
@@ -439,13 +427,7 @@
     (define dealer0 (dealer #:players players #:cards cards #:watering pre))
     (define pre-dealer-json (send dealer0 to-json))
     (with-handlers ([exn:fail:contract? (lambda (x) (debug `("contract:" ,msg)) (raise x))])
-      (check-equal? (begin [(testing) dealer0] (get-field watering-hole dealer0)) post msg))
-    (define pst-dealer-json (send dealer0 to-json))
-    ;; --- let's write them out
-    (write-test-case pre-dealer-json pst-dealer-json)
-    (cond
-      [(set-add-test-in-hook) => add-test-input]
-      [else (void)]))
+      (check-equal? (begin [(testing) dealer0] (get-field watering-hole dealer0)) post msg)))
   
   (define set-add-test-in-hook (make-parameter #false))
   
@@ -514,7 +496,6 @@
   ;; -------------------------------------------------------------------------------------------------
   ;; testing the feed1 step
   (testing (lambda (dealer0) (send dealer0 feed1)))
-  (write-out-tests #f)
   
   (log-info "testing feed1")
   
@@ -998,11 +979,6 @@
   
   (log-info "testing feeding")
   
-  ;; ****************************************
-  ;; DON'T EVER TURN THOSE ON FOR A TEST FEST
-  (write-out-tests #f)
-  ;; ****************************************
-  
   ;; -------------------------------------------------------------------------------------------------
   (check-scenario #:doc "FF no food, no feeding happens"
                   #:before
@@ -1465,7 +1441,6 @@
 (module+ test
   ;; -------------------------------------------------------------------------------------------------
   ;; testing step 4: (testing ...) is set way for each scenario
-  (write-out-tests #f)
   
   (log-info "testing step4")
   
@@ -1478,8 +1453,7 @@
   (define (& fc*) (map (lambda (x) '()) fc*))
   (define (step4 fc* #:gp [gp* (& fc*)] #:gb [gb* (& fc*)] #:bt [bc* (& fc*)] #:rt [tr* (& fc*)])
     (define input (map list fc* gp* gb* bc* tr*))
-    (testing (lambda (dealer) (send dealer step4 input)))
-    (set-add-test-in-hook (map action4->json input)))
+    (testing (lambda (dealer) (send dealer step4 input))))
   
   (step4 '(0 0 0))
   
@@ -1634,7 +1608,6 @@
 (module+ test
   ;; -------------------------------------------------------------------------------------------------
   ;; testing boards-for-all: (testing ...) is set way for each scenario
-  (write-out-tests #f)
   (testing (lambda (dealer) (send dealer boards-for-all)))
   
   (log-info "testing boards for all")
@@ -1651,7 +1624,6 @@
 (module+ test
   ;; -------------------------------------------------------------------------------------------------
   ;; testing step1: (testing ...) is set way for each scenario
-  (write-out-tests #f)
   (testing (lambda (dealer) (send dealer step1)))
   
   (log-info "testing step1")
@@ -1679,7 +1651,6 @@
 (module+ test
   ;; -------------------------------------------------------------------------------------------------
   ;; testing turn: (testing ...) is set way for each scenario
-  (write-out-tests #f)
   (testing (lambda (dealer) (send dealer move-food-to-bags)))
   
   (log-info "testing move-food-to-bag")
@@ -1702,7 +1673,6 @@
 (module+ test
   ;; -------------------------------------------------------------------------------------------------
   ;; testing turn: (testing ...) is set way for each scenario
-  (write-out-tests #f)
   (testing (lambda (dealer) (send dealer results)))
   
   (log-info "testing results")
@@ -1715,12 +1685,11 @@
   (define p3 (player 3 #:bag 66))
   (define final-dealer (dealer #:players (list p1 p2 p3)))
   
-  (run-write-json-test2 final-dealer '([3 66][2 58][1 37]) "end of game: score players"))
+  (run-testing final-dealer '([3 66][2 58][1 37]) "end of game: score players"))
 
 (module+ test
   ;; -------------------------------------------------------------------------------------------------
   ;; testing turn: (testing ...) is set way for each scenario
-  (write-out-tests #f)
   (testing (lambda (dealer) (send dealer results)))
   
   (log-info "run many games")

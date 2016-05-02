@@ -42,7 +42,7 @@
 
 (define proxy-player%
   (class object%
-    (init-field in out)
+    (init-field (in (current-input-port)) (out (current-output-port)))
     (super-new)
     
     ;; no return expected    
@@ -126,21 +126,16 @@
   ;; It's really important to test the json converters extensively. 
   
   (define-syntax-rule
-    (check-method m:id args:id args-json response)
-    (let* ([*out (gensym)]
-           [output 
-            (with-output-to-string
-             (lambda ()
-               (define j (if (void? response) "" (to-json* response)))
-               (set! *out 
-                     (with-input-from-string
-                      (make-test j)
-                      (lambda ()
-                        [define p (create-proxy-player (current-input-port) (current-output-port))]
-                        (send p m:id . args:id))))))])
-      (check-equal? (with-input-from-string output read-json) args-json "output test")
-      (unless (void? response)
-        (check-equal? *out response "result test"))))
+    (check-method m:id args:id args:json from-remote)
+    (let* ([input (cond
+                    [(void? from-remote) '()]
+                    [(object? from-remote) (list (send from-remote to-json))]
+                    [else (list from-remote)])])
+      (testing (lambda () (send (new proxy-player%) m:id . args:id)))
+      (if (void? from-remote)
+          (run-json-testing (format "method test, just output: ~a" 'm:id) input (list args:json))
+          (run-json-testing (format "method test, both: ~a" 'm:id) input (list args:json)
+                            #:result from-remote))))
   
   ;; -------------------------------------------------------------------------------------------------
   (define s (species #:traits `(,ambush)))
@@ -149,7 +144,7 @@
   ;; testing start, no response expected, which is what (void) indicates 
   (define start1 `[12 1 () ,(take all-cards 4)])
   (check-method start start1 (apply start->json start1) (void))
-  
+
   ;; -------------------------------------------------------------------------------------------------
   ;; testing choose, tests json->action4
   (define choose1 `[((,s)) ((,s))])
@@ -169,6 +164,4 @@
   (check-method feed-next next1 (apply state->json next1) (feed-none))
   (check-method feed-next next1 (apply state->json next1) (feed-vegetarian 1))
   (check-method feed-next next1 (apply state->json next1) (feed-carnivore 1 2 3))
-  (check-method feed-next next1 (apply state->json next1) (store-fat-on-tissue 1 2))
-  
-  )
+  (check-method feed-next next1 (apply state->json next1) (store-fat-on-tissue 1 2)))

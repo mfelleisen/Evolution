@@ -23,6 +23,15 @@
    ;; send bad kind of strings for sign-up
    (->* (input-port? output-port? external-player/c) (string? #;any-string) dealer-external/c))))
 
+
+
+
+(define OK "ok")
+
+
+
+
+
 ;; ===================================================================================================
 ;; DEPENDENCIES
 
@@ -94,7 +103,7 @@
                   (to))])]]))
     
     (define/private ((err from) input)
-      (error 'proxy-dealer "bad message in state: ~a: ~e" from input))
+      (raise-argument-error 'proxy-dealer (format "bad message in state ~a:" from) input))
     
     (define/public (run-game)
       (parameterize ([current-input-port in] [current-output-port out])
@@ -155,63 +164,58 @@
   
   (define (s f) (species #:food f #:population 1 #:traits `(,ambush ,long-neck)))
   (define (start1 f) (list 12 4 (list (send (s f) to-json)) (map card->json (take all-cards 5))))
-  (define OK (make-test "ok"))
   
   ;; -------------------------------------------------------------------------------------------------
   (define in0
-    (string-append
-     OK
-     ;; start
-     (make-test (start1 0))
-     ;; choose (arguments ignored anyway)
-     (make-test (list '() '()))
-     ;; and start again:
-     (make-test (start1 0))))
+    `(,OK
+      ;; start
+      ,(start1 0)
+      ;; choose (arguments ignored anyway)
+      ,(list '() '())
+      ;; and start again:
+      ,(start1 0)))
   
   (define out0
-    (string-append
-     (make-test SIGN-UP)
-     ;; no response from start
-     (make-test '(0 ((1 3)) ((1 4)) ((1 2)) ()))
-     ;; no response from second start
-     ))
+    `(,SIGN-UP
+      ;; no response from start
+      (0 ((1 3)) ((1 4)) ((1 2)) ())
+      ;; no response from second start
+      ))
   
-  (check-equal? (pipe in0) out0 "checking I/O: for start, choose, start")
+  (run-json-testing "checking I/O: for start, choose, start" in0 out0)
   
   ;; -------------------------------------------------------------------------------------------------
   (define in1
-    (string-append
-     OK
-     ;; start
-     (make-test (start1 0))
-     ;; choose (arguments ignored anyway)
-     (make-test (list '() '()))
-     ;; feed-next
-     (make-test (append (rest (start1 0)) '(1 ())))
-     ;; feed-next
-     (make-test (append (rest (start1 0)) '(1 ())))
-     ;; and start again:
-     (make-test (start1 1))))
+    `(
+      ,OK
+      ;; start
+      ,(start1 0)
+      ;; choose (arguments ignored anyway)
+      ,(list '() '())
+      ;; feed-next
+      ,(append (rest (start1 0)) '(1 ()))
+      ;; feed-next
+      ,(append (rest (start1 0)) '(1 ()))
+      ;; and start again:
+      ,(start1 1)))
   
   (define out1
-    (string-append
-     (make-test SIGN-UP)
-     ;; no response from start
-     (make-test '(0 ((1 3)) ((1 4)) ((1 2)) ()))
-     (make-test 0)
-     (make-test 0)
-     ;; no response from second start
-     ))
+    `(,SIGN-UP
+      ;; no response from start
+      (0 ((1 3)) ((1 4)) ((1 2)) ())
+      0
+      0
+      ;; no response from second start
+      ))
   
-  (check-equal? (pipe in1) out1 "checking I/O: for start, choose, feed-next, feed-next, start")
+  (run-json-testing "checking I/O: for start, choose, feed-next, feed-next, start" in1 out1)
   
   ;; -------------------------------------------------------------------------------------------------
   (define in2
-    (string-append
-     OK
-     ;; start
-     (make-test (start1 0))
-     ;; feed-next
-     (make-test (append (start1 0) '(1 ())))))
+    `(,OK
+      ;; start
+      ,(start1 0)
+      ;; feed-next
+      ,(append (start1 0) '(1 ()))))
   
-  (check-exn exn:fail? (lambda () (pipe in2)) "checking exn behavior for start -> feed-next"))
+  (run-json-exn-testing "checking exn behavior for start -> feed-next" in2 exn:fail:contract?))

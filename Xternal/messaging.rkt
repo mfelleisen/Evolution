@@ -27,7 +27,7 @@
    ;; (Because tcp-read gets RST from linux servers from time to time.)
    ;; EFFECT a timed reader for JSON messages
    ;; EFFECT log errors and exceptions and time-outs 
-   (-> (or/c jsexpr? 'timeout-1 'timeout-2 eof 'error))]))
+   (-> (or/c jsexpr? eof-object? 'timeout-1 'timeout-2 'error))]))
 
 ;; ===================================================================================================
 ;; DEPENDENCIES

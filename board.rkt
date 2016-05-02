@@ -103,11 +103,7 @@
 (require  "common.rkt")
 
 (module+ test
-  (require rackunit (submod ".."))
-  
-  (require (submod "common.rkt" test))
-  (write-out-tests #f)
-  (testing (lambda (x y z w) (send x attackable? y z w))))
+  (require rackunit (submod "..") (submod "common.rkt" test)))
 
 ;; ===================================================================================================
 ;; IMPLEMENTATION
@@ -279,6 +275,8 @@
 
 ;; ===================================================================================================
 (module+ test
+  (testing (lambda (x y z w) (send x attackable? y z w)))
+  
   ;; -------------------------------------------------------------------------------------------------
   (define (attacker1 2traits)
     (species #:body 3 #:food 2 #:population 4 #:traits `(,carnivore ,@2traits)))
@@ -297,38 +295,38 @@
   (define att-plain (attacker1 '()))
   
   (define def-plain (species #:body 1 #:food 3 #:population 4))
-  (run-write-json-test2 def-plain att-plain #f #f #true "plain attack")
+  (run-testing def-plain att-plain #f #f #true "plain attack")
   
   (define (def-burrow f p) (species #:body 1 #:food f #:population p #:traits `(,burrowing)))
-  (run-write-json-test2 (def-burrow 1 1) att-plain #f #f #false "defend with burrowing")
-  (run-write-json-test2 (def-burrow 3 4) att-plain #f #f #true  "overcome burrowing")
+  (run-testing (def-burrow 1 1) att-plain #f #f #false "defend with burrowing")
+  (run-testing (def-burrow 3 4) att-plain #f #f #true  "overcome burrowing")
   
   (define def-climbing (species #:body 1 #:food 3 #:population 4 #:traits `(,climbing)))
   (define att-climbing (attacker1 `(,climbing)))
-  (run-write-json-test2 def-climbing att-plain    #f #f #false "defend with climbing")
-  (run-write-json-test2 def-climbing att-climbing #f #f #true  "overcome climbing")
+  (run-testing def-climbing att-plain    #f #f #false "defend with climbing")
+  (run-testing def-climbing att-climbing #f #f #true  "overcome climbing")
   
   (define def-hard (species #:body 2 #:food 2 #:population 3 #:traits `(,hard-shell)))
-  (run-write-json-test2 def-hard att-plain #f #f #false "defend with hard shell")
+  (run-testing def-hard att-plain #f #f #false "defend with hard shell")
   
   (define att-big (species #:body 7 #:food 2 #:population 3 #:traits `(,carnivore)))
   (define att-pack (species #:body 3 #:food 2 #:population 4 #:traits `(,carnivore ,pack-hunting)))
-  (run-write-json-test2 def-hard att-big  #f #f #true "overcome hard shell with large size")
-  (run-write-json-test2 def-hard att-pack #f #f #true "overcome hard shell with pack hunting")
+  (run-testing def-hard att-big  #f #f #true "overcome hard shell with large size")
+  (run-testing def-hard att-pack #f #f #true "overcome hard shell with pack hunting")
   
   (define def-wc (species #:body 2 #:food 2 #:population 3 #:traits `(,warning-call)))
   (define att-ambush (attacker1 `(,ambush)))
   
-  (run-write-json-test2 def-plain att-plain def-wc #f     #false "defend with warning call left")
-  (run-write-json-test2 def-plain att-plain #f     def-wc #false "defend with warning call right")
-  (run-write-json-test2 def-plain att-plain def-wc def-wc #false "defend with warning call both")
-  (run-write-json-test2 def-plain att-ambush #f    def-wc #true  "overcome with warning call ambush")
+  (run-testing def-plain att-plain def-wc #f     #false "defend with warning call left")
+  (run-testing def-plain att-plain #f     def-wc #false "defend with warning call right")
+  (run-testing def-plain att-plain def-wc def-wc #false "defend with warning call both")
+  (run-testing def-plain att-ambush #f    def-wc #true  "overcome with warning call ambush")
   
   (define (def with) (species #:body 2 #:food 2 #:population 2 #:traits `(,hard-shell ,@with)))
   (define att-ambush-pack (attacker1 `(,ambush ,pack-hunting)))
   
-  (run-write-json-test2 (def '())          att-ambush-pack def-wc #f #true "overcome hards w/ pack")
-  (run-write-json-test2 (def `(,climbing)) att-ambush-pack def-wc #f #false "defend mix w/ climbing")
+  (run-testing (def '())          att-ambush-pack def-wc #f #true "overcome hards w/ pack")
+  (run-testing (def `(,climbing)) att-ambush-pack def-wc #f #false "defend mix w/ climbing")
   
-  (run-write-json-test2 (def `(,pack-hunting)) att-plain #f #f #false
+  (run-testing (def `(,pack-hunting)) att-plain #f #f #false
                         "defend w/ hard-shell & pack-hunting (fail the trait people)"))

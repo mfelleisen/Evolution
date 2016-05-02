@@ -11,14 +11,12 @@
 
 (provide
  (contract-out
-  [create-external (-> (external-player/c pre-choose))]
-  [json->player    (-> any/c (external-player/c pre-choose))]
-  [action4->json   (-> action4/c any/c)])
-
+  [create-external (-> (external-player/c pre-choose))])
+ 
  ;; [Natural Boards Cards Natural Players -> Any] -> ExternalPlayer
  ;; creating players that act badly during feed-next
  create-bad-feed
-
+ 
  ;; Natural -> [Natural Boards Cards Natural Players -> Any]
  ;; ways to act badly during feed-next after a while 
  feed-inf
@@ -27,7 +25,7 @@
  ;; [Cards Boards -> Any] -> ExternalPlayer
  ;; creating players that act badly durinh choose
  create-bad-choose
-
+ 
  ;; Natural -> [Cards Boards -> Any]
  ;; ways to act badly during choose after a while 
  no-fc
@@ -99,25 +97,6 @@
       [else
        (set! n (- n 1))
        #false])))
-
-(define (json->player j)
-  (match j
-    [`(("id" ,(? natural+? id)) ("species" ,(? list? s)) ("bag" ,(? natural? b)))
-     (x-player b (map json->species s))]
-    [`(("id" ,(? natural+? id)) ("species" ,(? list? s)) ("bag" ,(? natural? b)) ("cards" ,c))
-     (x-player b (map json->species s) (map json->card c))]))
-
-(define (x-player b s (c '()))
-  (define ex (create-external))
-  (set-field! bag ex b)
-  (set-field! boards ex s)
-  (set-field! cards ex c)
-  ex)
-
-(define (action4->json j)
-  (match-let ([`[,fc ,gp* ,gb* ,bc* ,tr*] j])
-    (list fc (map (add "population") gp*) (map (add "body") gb*) bc* tr*)))
-(define ((add s) x) (cons s x))
 
 ;; ---------------------------------------------------------------------------------------------------
 ;; an external player with a specific strategy
@@ -228,7 +207,6 @@
     (define/private (sort/i s* #:species [boards boards] #:key [k values])
       (sort s* (lambda (s1 s2) (>-species (list-ref boards s1) (list-ref boards s2))) #:key k))))
 
-
 (define (False x) #f)
 
 (define exists-hungry/c
@@ -264,7 +242,6 @@
 
 ;; ===================================================================================================
 (module+ test
-  (write-out-tests #f)
   (testing (lambda (x y z) (send x feed-next y z)))
   
   ;; an extension that simulates the calling behavior for the test suite via an internal player
@@ -299,21 +276,21 @@
   (define p1.1 (player/x 55 #:species (list s1 s4)))
   (define p1.2 (player/x 66 #:species (list s2)))
   
-  (run-write-json-test2 p1 1 '() (feed-vegetarian 0) "feed the one hungry vegetarian")
-  (run-write-json-test2 p1.1 1 '() (feed-vegetarian 0) "feed the hungrier vegetarian in order")
+  (run-testing p1 1 '() (feed-vegetarian 0) "feed the one hungry vegetarian")
+  (run-testing p1.1 1 '() (feed-vegetarian 0) "feed the hungrier vegetarian in order")
   
   ;; -------------------------------------------------------------------------------------------------
   ;; tell dealer that the player will not attack its own species 
   (define p2 (player/x 2 #:species (list s3 s2)))
   
-  (run-write-json-test2 p2 1 '() (feed-none) "will not attack my own species")
+  (run-testing p2 1 '() (feed-none) "will not attack my own species")
   
   ;; -------------------------------------------------------------------------------------------------
   ;; pick the 'first' attackable species from a player that has three of them,
   ;; after skipping over a player that has none and another one that has no attackable one
   (define p3 (player/x 3 #:species (list s4)))
   
-  (run-write-json-test2 p2 1 (list p0 p3 p1) (feed-carnivore 0 2 1) "three players")
+  (run-testing p2 1 (list p0 p3 p1) (feed-carnivore 0 2 1) "three players")
   
   ;; -------------------------------------------------------------------------------------------------
   ;; seveeral players' species can be attacked 
@@ -321,7 +298,7 @@
   (define p4 (player/x 4 #:species (list s2)))
   (define p5 (player/x 5 #:species (list s2)))
   (define p6 (player/x 6 #:species (list s3)))
-  (run-write-json-test2 p2 1 (list p0 p3 p4 p5 p6) (feed-carnivore 0 2 0) "five players")
+  (run-testing p2 1 (list p0 p3 p4 p5 p6) (feed-carnivore 0 2 0) "five players")
   
   ;; -------------------------------------------------------------------------------------------------
   ;; add a fat-tissue card
@@ -329,14 +306,14 @@
   (define s-ft (species #:body 2 #:food 0 #:population 3 #:traits `(,fat-tissue)))
   (define p-ft (player/x 7 #:species (list s1 s-ft s2 s3)))
   
-  (run-write-json-test2 p-ft 2 (list p0) (store-fat-on-tissue 1 2) "fat tissue card")
+  (run-testing p-ft 2 (list p0) (store-fat-on-tissue 1 2) "fat tissue card")
   
   ;; -------------------------------------------------------------------------------------------------
   ;; add two fat-tissue cards to two different species, one with more needs than the other 
   (define s-f2 (species #:body 5 #:food 0 #:population 3 #:traits `(,fat-tissue)))
   (define p-f2 (player/x 8 #:species (list s-ft s-f2)))
   
-  (run-write-json-test2 p-f2 2 (list p0) (store-fat-on-tissue 1 5) "2 fat tissue cards, 1 more need")
+  (run-testing p-f2 2 (list p0) (store-fat-on-tissue 1 5) "2 fat tissue cards, 1 more need")
   
   ;; -------------------------------------------------------------------------------------------------
   ;; add two fat-tissue cards to two different species, both with the same needs, sortable 
@@ -344,14 +321,14 @@
   (define s-f4 (species #:body 3 #:food 0 #:population 3 #:traits `(,fat-tissue)))
   (define p-f3 (player/x 9 #:species (list s-f3 s-f4)))
   
-  (run-write-json-test2 p-f3 2 '() (store-fat-on-tissue 1 3) "fat, same needs, sortable")
+  (run-testing p-f3 2 '() (store-fat-on-tissue 1 3) "fat, same needs, sortable")
   
   ;; -------------------------------------------------------------------------------------------------
   ;; add two fat-tissue cards to two different species, both with the same needs, not sortable
   (define s-f5 (species #:body 3 #:food 0 #:population 3 #:traits `(,fat-tissue ,climbing)))
   (define p-f4 (player/x 10 #:species (list s-f5 s-f4)))
   
-  (run-write-json-test2 p-f4 3 '() (store-fat-on-tissue 0 3) "fat, same needs, not sortable")
+  (run-testing p-f4 3 '() (store-fat-on-tissue 0 3) "fat, same needs, not sortable")
   
   ;; -------------------------------------------------------------------------------------------------
   ;; add fat-tissue card that can store additional food 
@@ -359,8 +336,8 @@
     (species #:body 3 #:fat-food ff #:food 3 #:population 3 #:traits `(,fat-tissue ,climbing)))
   (define (p-f5 ff) (player/x 11 #:species (list (s-f6 ff))))
   
-  (run-write-json-test2 (p-f5 2) 3 '() (store-fat-on-tissue 0 1) "fat with some food, needs more (1)")
-  (run-write-json-test2 (p-f5 1) 2 '() (store-fat-on-tissue 0 2) "fat with some food, needs more(2)"))
+  (run-testing (p-f5 2) 3 '() (store-fat-on-tissue 0 1) "fat with some food, needs more (1)")
+  (run-testing (p-f5 1) 2 '() (store-fat-on-tissue 0 2) "fat with some food, needs more(2)"))
 
 ;; these are the tests from #5 turned into feed-next tests 
 (module+ test
@@ -394,35 +371,35 @@
   (define def-plain (species #:body 1 #:food 3 #:population 4))
   (define p501 (player/x 501 #:species (list att-plain)))
   (define p502 (player/x 502 #:species (list def-plain)))
-  (run-write-json-test2 p501 9 (list p502) zero "plain attack")
+  (run-testing p501 9 (list p502) zero "plain attack")
   
   (define (def-burrow f p) (species #:body 1 #:food f #:population p #:traits `(,burrowing)))
   (define p503 (player/x 503 #:species (list (def-burrow 1 1))))
   (define p504 (player/x 504 #:species (list (def-burrow 3 4))))
   
-  (run-write-json-test2 p501 1 (list p503) none "defend with burrowing")
-  (run-write-json-test2 p501 1 (list p504) zero "overcome burrowing")
+  (run-testing p501 1 (list p503) none "defend with burrowing")
+  (run-testing p501 1 (list p504) zero "overcome burrowing")
   
   (define def-climbing (species #:body 1 #:food 3 #:population 4 #:traits `(,climbing)))
   (define att-climbing (attacker1 `(,climbing)))
   (define p511 (player/x 511 #:species (list att-climbing)))
   (define p512 (player/x 512 #:species (list def-climbing)))
   
-  (run-write-json-test2 p501 1 (list p512) none "defend with climbing")
-  (run-write-json-test2 p511 1 (list p512) zero "overcome climbing")
+  (run-testing p501 1 (list p512) none "defend with climbing")
+  (run-testing p511 1 (list p512) zero "overcome climbing")
   
   (define def-hard (species #:body 2 #:food 2 #:population 3 #:traits `(,hard-shell)))
   (define p521 (player/x 521 #:species (list def-hard)))
   
-  (run-write-json-test2 p501 1 (list p521) none "defend with hard shell")
+  (run-testing p501 1 (list p521) none "defend with hard shell")
   
   (define att-big (species #:body 7 #:food 2 #:population 3 #:traits `(,carnivore)))
   (define att-pack (species #:body 3 #:food 2 #:population 4 #:traits `(,carnivore ,pack-hunting)))
   (define p531 (player/x 531 #:species (list att-big)))
   (define p532 (player/x 532 #:species (list att-pack)))
   
-  (run-write-json-test2 p531 1 (list p521) zero "overcome hard shell with large size")
-  (run-write-json-test2 p532 1 (list p521) zero "overcome hard shell with pack hunting")
+  (run-testing p531 1 (list p521) zero "overcome hard shell with large size")
+  (run-testing p532 1 (list p521) zero "overcome hard shell with pack hunting")
   
   (define def-wc (species #:body 2 #:food 2 #:population 3 #:traits `(, climbing ,warning-call)))
   (define att-ambush (attacker1 `(,ambush)))
@@ -433,10 +410,10 @@
   
   ;; exception:
   
-  (run-write-json-test2 p501 1 (list p542) none "defend with warning call left")
-  (run-write-json-test2 p501 1 (list p543) none "defend with warning call right")
-  (run-write-json-test2 p501 1 (list p544) none "defend with warning call both")
-  (run-write-json-test2 p541 1 (list p543) zero "overcome with warning call ambush")
+  (run-testing p501 1 (list p542) none "defend with warning call left")
+  (run-testing p501 1 (list p543) none "defend with warning call right")
+  (run-testing p501 1 (list p544) none "defend with warning call both")
+  (run-testing p541 1 (list p543) zero "overcome with warning call ambush")
   
   (define (def with) (species #:body 2 #:food 2 #:population 2 #:traits `(,hard-shell ,@with)))
   (define att-ambush-pack (attacker1 `(,ambush ,pack-hunting)))
@@ -444,12 +421,11 @@
   (define p552 (player/x 552 #:species (list def-wc (def '()))))
   (define p553 (player/x 553 #:species (list def-wc (def `(,climbing)))))
   
-  (run-write-json-test2 p551 1 (list p552) (feed-carnivore 0 0 1) "overcome hards w/ pack")
-  (run-write-json-test2 p551 1 (list p553) none "defend mix w/ climbing"))
+  (run-testing p551 1 (list p552) (feed-carnivore 0 0 1) "overcome hards w/ pack")
+  (run-testing p551 1 (list p553) none "defend mix w/ climbing"))
 
 (module+ test
   ;; testing choose for external (silly) player
-  (write-out-tests #t)
   (testing (lambda (x y z) (send x choose y z)))
   
   (define (player-with-cards c)
@@ -461,27 +437,23 @@
   (define before (list '() '()))
   (define after (list '()))
   
-  (run-write-json-test3
+  (run-testing
    (player-with-cards (take all-cards 4)) before after
    '(0 [(1 3)] [] [(1 2)] [])
-   action4->json
    "minimal # of cards, yields one extra board and one population growth")
   
-  (run-write-json-test3
+  (run-testing
    (player-with-cards (take all-cards 5)) before after
    '(0 [(1 3)] [(1 4)] [(1 2)] [])
-   action4->json
    "add 1 to min # of cards, yields one extra board, one population/body growth")
   
-  (run-write-json-test3
+  (run-testing
    (player-with-cards (take all-cards 6)) before after
    '(0 [(1 3)] [(1 4)] [(1 2)] [(1 0 5)])
-   action4->json
    "add 2 to min # of cards, yields: extra board, 1 population, 1 body growth, 1 rt")
   
-  (run-write-json-test3
+  (run-testing
    (player-with-cards (take all-cards 7)) before after
    '(0 [(1 3)] [(1 4)] [(1 2)] [(1 0 5)])
-   action4->json
    "add 3 to min # of cards, yields: extra board, 1 population, 1 body growth, 1 rt")
   )
