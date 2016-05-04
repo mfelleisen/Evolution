@@ -3,6 +3,7 @@
 TO DO
 -----
 
+5. put json-> for test harnesses in proper place (test modules) <-- Finish 
 4. bring back gui in xmain and xserver 
 9. document JSON in this subdirectory's README 
 10. add xdist-bad-clients to test error handling 

@@ -69,16 +69,6 @@
     ;; this is basically nonsense 
     (define/public (equal-secondary-hash-code-of hash-code)
       (hash-code cards))
-    
-    ;; -----------------------------------------------------------------------------------------------
-    ;; serialization
-    
-    (define/public (to-json)
-      `(("species" ,(for/list ((s boards)) (send s to-json)))
-        ("bag" ,bag)
-        ,@(if (empty? cards)
-              `()
-              `(("cards" ,(map card->json cards))))))
 
     ;; -----------------------------------------------------------------------------------------------
     ;; methods for communicating between external player and intenal representation

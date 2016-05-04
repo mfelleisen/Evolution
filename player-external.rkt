@@ -117,13 +117,6 @@
     (inherit with-fat-tissue separate-hungries can-attack can-attack+)
     
     ;; -----------------------------------------------------------------------------------------------
-    (define/override (to-json)
-      `(("id"      ,(+ (random 100) 1))
-        ("species" ,(map (lambda (s) (send s to-json)) boards))
-        ("bag"     ,(random 100))
-        ("cards"   ,(map card->json cards))))
-    
-    ;; -----------------------------------------------------------------------------------------------
     ;; EFFECT just accept what given 
     (define/override (start _watering-hole bag-turn boards-turn cards-turn)
       (set!-values (bag boards cards) (values bag-turn boards-turn cards-turn)))

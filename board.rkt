@@ -81,18 +81,7 @@
          #:food       [f  (p) (food/c p)]
          #:population [p      population/c]
          #:traits     [t      traits/c])
-        [r species/c])]
-  
-  [json->species
-   ;; convert a JSexpr into a Species if it meets the JSON and Species specs 
-   ;; EFFECT raise exn:misc:match? otherwise 
-   ;; HINT use json->opt-species instead of json->species when additional possibilities exist
-   ;; (-> JSexpr Species)
-   any/c])
- 
- ;; syntax
- ;; (json->opt-species JSexpr MatchClause ...) : [Maybe Species]
- json->opt-species)
+        [r species/c])]))
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
@@ -103,7 +92,7 @@
 (require  "common.rkt")
 
 (module+ test
-  (require rackunit (submod "..") (submod "common.rkt" test)))
+  (require (submod "..") (submod "common.rkt" test) rackunit))
 
 ;; ===================================================================================================
 ;; IMPLEMENTATION
@@ -129,29 +118,6 @@
   (set traits)
   (set fat-food)
   s)
-
-(define-syntax-rule
-  (json->opt-species j false-clause ...)
-  ;; ==> 
-  (match j
-    false-clause ...
-    [`(("food" ,(? nat? f)) ("body" ,(? nat? b)) ("population" ,(? nat? p))
-                            ("traits" ,(? lot? t)))
-     (species #:body b #:food f #:population p #:traits (map json->trait t))]
-    [`(("food" ,(? nat? f)) ("body" ,(? nat? b)) ("population" ,(? nat? p))
-                            ("traits" ,(? lot? t))
-                            ("fat-food" ,(? nat? ff)))
-     (species #:body b #:fat-food ff #:food f #:population p #:traits (map json->trait t))]))
-
-(define (nat? x)
-  (and (natural? x) (<= 0 x 7)))
-
-(define (json->species j)
-  (json->opt-species j))
-
-;; Any -> Boolean 
-(define (lot? l)
-  (and (list? l) (<= (length l) SPECIES-TRAITS)))
 
 (define SPECIES-TRAITS 3)
 
@@ -187,15 +153,7 @@
     ;; this is basically nonsense 
     (define/public (equal-secondary-hash-code-of hash-code)
       (hash-code traits))
-    
-    ;; -----------------------------------------------------------------------------
-    (define/public (to-json)
-      `(("food" ,food)
-        ("body" ,body)
-        ("population" ,population)
-        ("traits" ,(map trait->json traits))
-        ,@(if (and (> fat-food 0) (has fat-tissue?)) `(("fat-food" ,fat-food)) '())))
-    
+
     ;; -----------------------------------------------------------------------------
     (define/public (attackable? attacker left right)
       (cond
@@ -280,15 +238,7 @@
   ;; -------------------------------------------------------------------------------------------------
   (define (attacker1 2traits)
     (species #:body 3 #:food 2 #:population 4 #:traits `(,carnivore ,@2traits)))
-  
-  ;; -------------------------------------------------------------------------------------------------
-  (check-equal? (json->species (send (attacker1 '()) to-json)) (attacker1 '())
-                "json->species is left-inverse for to-json")
-  
-  (define s0 (species #:fat-food 2 #:traits `(,fat-tissue)))
-  (check-equal? (json->species (send s0 to-json)) s0
-                "json->species is left-inverse for to-json, with fat food")
-  
+
   ;; -------------------------------------------------------------------------------------------------
   ;; attackable tests
   

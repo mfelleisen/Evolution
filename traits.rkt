@@ -11,11 +11,11 @@
  ;; Any -> Boolean : Trait
  trait? 
 
- ;; Trait -> JSexpr
- trait->json
+ ;; Trait -> String 
+ trait->string 
 
- ;; JSExpr -> Trait
- json->trait
+ ;; JSExpr -> String
+ string->trait
  
  ;; Trait
  carnivore
@@ -82,15 +82,15 @@
 ;; ---------------------------------------------------------------------------------------------------
 (define-traits tester* tester) ;; define a special tester trait
 (module+ test
-  (check-equal? (json->trait (trait->json tester)) tester))
+  (check-equal? (string->trait (trait->string tester)) tester))
 
-(define (trait->json x)
+(define (trait->string x)
   (define r (assq x *trait-x-string-representation))
-  (if r (second r) (error 'trait->json "~e" x)))
+  (if r (second r) (error 'trait->string "~e" x)))
 
-(define (json->trait j)
+(define (string->trait j)
   (define r (argmax (lambda (x) (if (string=? (second x) j) 1 0)) *trait-x-string-representation))
-  (if r (first r) (error 'json->trait "~e" j)))
+  (if r (first r) (error 'string->trait "~e" j)))
 
 ;; ---------------------------------------------------------------------------------------------------
 ;; specifying traits 
@@ -123,5 +123,5 @@
   (check-false (<-trait herding hard-shell)))
 
 (define (<-trait t1 t2)
-  (string<? (trait->json t1) (trait->json t2)))
+  (string<? (trait->string t1) (trait->string t2)))
 

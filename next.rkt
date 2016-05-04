@@ -155,15 +155,13 @@
     
     (define/public (acceptable? other) #false)
     
-    (abstract interpret to-json)))
+    (abstract interpret)))
 
 ;; ---------------------------------------------------------------------------------------------------
 (define feed-none%
   (class* next% (equal<%>)
     (super-new)
-    
-    (define/override (to-json) #false)
-    
+
     (define/public (equal-to? other r)
       (and (is-a? other feed-none%)))
     
@@ -176,9 +174,7 @@
   (class* next% (equal<%>)
     (init-field s)
     (super-new)
-    
-    (define/override (to-json) s)
-    
+
     (define/public (equal-to? other r)
       (and (is-a? other feed-vegetarian%)
            (= (get-field s other) s)))
@@ -193,9 +189,7 @@
   (class* next% (equal<%>)
     (init-field s n)
     (super-new)
-    
-    (define/override (to-json) (list s n))
-    
+
     (define/public (equal-to? other r)
       (and (is-a? other store-fat-on-tissue%)
            (= (get-field s other) s)
@@ -216,9 +210,7 @@
   (class* next% (equal<%>)
     (init-field attacker p0 attackee)
     (super-new)
-    
-    (define/override (to-json) (list attacker p0 attackee))
-    
+
     (define/public (equal-to? other r)
       (and (is-a? other feed-carnivore%)
            (= (get-field attacker other) attacker)

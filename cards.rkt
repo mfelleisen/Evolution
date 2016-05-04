@@ -22,13 +22,7 @@
  all-cards
  
  ;; [Setof Card] -> Boolean 
- subset-of-all-cards?
- 
- ;; JSexpr -> Card
- json->card
- 
- ;; Card -> JSexpr
- card->json)
+ subset-of-all-cards?)
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
@@ -84,21 +78,3 @@
 
 (define (valid-card? c)
   (cons? (member c all-cards)))
-
-;; ---------------------------------------------------------------------------------------------------
-
-(module+ test
-  (define a-card (list-ref all-cards (random (length all-cards))))
-  (check-equal? (json->card (card->json a-card)) a-card "json->card is left inverse to card->json"))
-
-(define (card->json c)
-  `[,(card-food-points c) ,(trait->json (card-trait c))])
-
-(define (json->card j)
-  (match j
-    [`(,(? integer? food) ,trait)
-     (define candidate (card food (json->trait trait)))
-     (cond
-       [(member candidate all-cards) => first]
-       [else (error 'json->card "~e does not specify an Evolution card")])]))
-

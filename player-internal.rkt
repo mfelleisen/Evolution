@@ -57,7 +57,6 @@
     [can-attack            any/c]
     [with-fat-tissue 	   any/c]
     [separate-hungries 	   any/c]
-    [to-json          	   any/c]
     [equal-secondary-hash-code-of any/c]
     [equal-hash-code-of           any/c]
     [equal-to? 		 	  any/c])))
@@ -144,6 +143,7 @@
   (class* base-player% (equal<%>)
     (init-field
      id
+     [create-species species]
      [external #false])
     
     (super-new)
@@ -157,12 +157,6 @@
     (define/override (equal-to? other r)
       (and (equal? (get-field id other) id)
            (super equal-to? other r)))
-    
-    ;; -----------------------------------------------------------------------------------------------
-    ;; serialization
-    
-    (define/override (to-json)
-      (cons `("id" ,id) (super to-json)))
     
     ;; -----------------------------------------------------------------------------------------------
     (define/public (store-fat s n)
@@ -186,7 +180,7 @@
       (for ((bc bc*))
         (match-define `(,_payment ,trait-cards ...) bc)
         (define t (map card-trait (map (lambda (i) (card i)) trait-cards)))
-        (set! boards (append boards (list (species #:population 1 #:traits t))))))
+        (set! boards (append boards (list (create-species #:population 1 #:traits t))))))
     
     (define/private (modify-board* tr*)
       (for ((tr tr*))
@@ -235,7 +229,7 @@
     
     (define/public (add-board-if-needed)
       (when (empty? boards)
-        (set! boards (list (species #:population 1)))))
+        (set! boards (list (create-species #:population 1)))))
     
     (define/public (how-many-cards-needed)
       (+ (* (length boards) CARDS-PER-BOARD) CARD-PER-PLAYER))
