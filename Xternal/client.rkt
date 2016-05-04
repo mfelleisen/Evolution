@@ -68,7 +68,7 @@ exec racket -tm "$0" ${1+"$@"}
 (define-type Bad-Feed   (-> Natural (-> Any Any Any Any Any Any)))
 
 (require/typed
- "../player-external.rkt"
+ "player-external.rkt"
  [create-bad-choose (-> (-> Any Any Any) Any)]
  [create-bad-feed   (-> (-> Any Any Any Any Any Any) Any)]
  [no-fc             Bad-Choice]
@@ -84,7 +84,7 @@ exec racket -tm "$0" ${1+"$@"}
  [REMOTE-PORT Natural])
 
 (require/typed
- "../common.rkt"
+ "common.rkt"
  [debug (-> Any Any)])
 
 ;; ===================================================================================================

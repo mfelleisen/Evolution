@@ -3,9 +3,9 @@
 (module+ test 
   (require (submod "proxy-dealer.rkt" json-from)
            (submod "proxy-player.rkt" json-to)
-           "../board.rkt"
+           "board.rkt"
            "../traits.rkt"
-           "../cards.rkt"
+           "cards.rkt"
            rackunit)
   
   (define start1 `[12 1 () ,(take all-cards 4)])

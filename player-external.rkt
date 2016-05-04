@@ -10,6 +10,8 @@
          (only-in "basics.rkt" natural? natural+?))
 
 (provide
+  external%
+
  (contract-out
   [create-external (-> (external-player/c pre-choose))])
  
@@ -102,7 +104,13 @@
 ;; an external player with a specific strategy
 (define external%
   (class* base-player% (equal<%>)
-    
+
+    (init-field
+      [create-feed-none feed-none]
+      [create-feed-vegetarian feed-vegetarian]
+      [create-store-fat-on-tissue store-fat-on-tissue]
+      [create-feed-carnivore feed-carnivore])
+
     (init-field
      [bad-choose
       ;; called on every call to choose; if it produces non-#f, that value is returned from choose
@@ -176,11 +184,11 @@
          (define fatties (with-fat-tissue))
          (cond
            [(cons? fatties)
-            (apply store-fat-on-tissue (argmax second (sort/i fatties #:key first)))]
+            (apply create-store-fat-on-tissue (argmax second (sort/i fatties #:key first)))]
            [else 
             (define-values (veggies carnivores) (separate-hungries))
             (cond
-              [(cons? veggies) (feed-vegetarian (first (sort/i veggies)))]
+              [(cons? veggies) (create-feed-vegetarian (first (sort/i veggies)))]
               [(cons? carnivores)
                (define sorted (sort/i carnivores))
                (define attackable-other-species
@@ -189,8 +197,8 @@
                  (for*/first ([c sorted] [a (in-value (can-attack+ c me boards))] #:when (cons? a))
                    (map rest a)))
                (cond
-                 [attackable-other-species (apply feed-carnivore attackable-other-species)]
-                 [(cons? attackable-my-species) (feed-none)]
+                 [attackable-other-species (apply create-feed-carnivore attackable-other-species)]
+                 [(cons? attackable-my-species) (create-feed-none)]
                  [else (define/contract species/post no-attackable-species/c boards) species/post])]
               [else
                (define/contract species/post exists-hungry/c #false) species/post])])]))

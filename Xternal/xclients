@@ -9,7 +9,7 @@ exec racket -W info -tm "$0" ${1+"$@"}
 
 ;; EXTERNAL SERVICES
 
-(require (only-in "../dealer.rkt" MAX-PLAYERS MIN-PLAYERS))
+(require (only-in "dealer.rkt" MAX-PLAYERS MIN-PLAYERS))
 
 (provide 
  (contract-out
@@ -27,7 +27,7 @@ exec racket -W info -tm "$0" ${1+"$@"}
 (require (rename-in "client.rkt" [main create-client]) "messaging.rkt")
 
 ;; for debugging
-(require "../common.rkt")
+(require "common.rkt")
 
 ;; ===================================================================================================
 ;; IMPLEMENTATION

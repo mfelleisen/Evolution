@@ -98,6 +98,9 @@
      [externals
       ;; [Listof [List String Player]]
       '()])
+
+    (init-field
+      [internal-player create-player])
     
     (super-new)
     
@@ -107,7 +110,7 @@
       ;; the players in the order in which they will take the next turn 
       (for/list ((e externals) (name (in-naturals)))
         (define id (format "~a#~a" (first e) (+ name 1)))
-        (create-player id (second e)))]
+        (internal-player id (second e)))]
      
      [watering-hole
       ;; N : the number of food tokens left in the watering hole 

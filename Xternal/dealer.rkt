@@ -15,14 +15,14 @@
   (create-dealer (create-dealer/c dealer/observer/c))))
 
 ;; ===================================================================================================
-(require "../dealer.rkt" "observer.rkt" "../cards.rkt")
+(require "../dealer.rkt" "player-internal.rkt" "observer.rkt" "cards.rkt")
 
 (define (create-dealer players (cards all-cards))
   (new xdealer% [externals players][cards cards]))
   
 (define xdealer%
   (class dealer%
-    (super-new)
+    (super-new [internal-player create-player])
 
     (inherit-field players watering-hole cards)
     

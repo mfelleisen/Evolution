@@ -115,6 +115,11 @@
  external-player/c
  pre-choose
  
+ feed-none%
+ feed-vegetarian%
+ store-fat-on-tissue%
+ feed-carnivore%
+
  (contract-out
   [one-of (-> any/c [listof next/c] boolean?)]
   

@@ -70,6 +70,7 @@
  CARD-PER-PLAYER
  
  internal-player/c
+ player%
  
  [contract-out
   [create-player (-> any/c #;==name? any/c #;==external? internal-communication/c)]])
@@ -145,6 +146,12 @@
      id
      [create-species species]
      [external #false])
+
+    (init-field
+      [create-feed-none feed-none]
+      [create-feed-vegetarian feed-vegetarian]
+      [create-store-fat-on-tissue store-fat-on-tissue]
+      [create-feed-carnivore feed-carnivore])
     
     (super-new)
     
@@ -202,13 +209,13 @@
         (send board body+1)))
     
     (define/private (feedable players*)
-      (define fatties (map (lambda (x) (apply store-fat-on-tissue x)) (with-fat-tissue)))
+      (define fatties (map (lambda (x) (apply create-store-fat-on-tissue x)) (with-fat-tissue)))
       (define-values (veggies0 carnivores) (separate-hungries))
-      (define veggies (map feed-vegetarian veggies0))
+      (define veggies (map create-feed-vegetarian veggies0))
       (define possible-attacks
         (if (empty? carnivores)
             '()
-            (map (lambda (x) (apply feed-carnivore (rest x)))
+            (map (lambda (x) (apply create-feed-carnivore (rest x)))
                  (for/fold ((attackables '())) ((c carnivores))
                    (append attackables (all-attackables c (strip players*)))))))
       (append veggies fatties possible-attacks))
@@ -258,11 +265,11 @@
     
     (define/public (next watering-hole in-attackable-order)
       (cond
-        [(= watering-hole 0) (feed-none)]
+        [(= watering-hole 0) (create-feed-none)]
         [else 
          (define possible-feedings (feedable in-attackable-order))
          (cond
-           [(empty? possible-feedings) (feed-none)]
+           [(empty? possible-feedings) (create-feed-none)]
            [(one? possible-feedings) (first possible-feedings)]
            [else
             ;; NOTE this function computes all feeding possibilities and

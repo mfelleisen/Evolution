@@ -28,7 +28,7 @@
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
-(require "../cards.rkt" "../traits.rkt" 2htdp/image)
+(require "cards.rkt" "../traits.rkt" 2htdp/image)
 
 ;; ===================================================================================================
 ;; IMPLEMENTATION
@@ -43,7 +43,7 @@
 (define food0     12)
 (define cards0    (map card->json (drop all-cards 22)))
 (define cards1    (map card->json (take all-cards 11)))
-(define traits0   (map trait->json `[,ambush ,carnivore ,warning-call]))
+(define traits0   (map trait->string `[,ambush ,carnivore ,warning-call]))
 (define species0  `[["food" 1] ["body" 2] ["population" 3] ["traits" ,traits0] ["fat-food" 3]])
 (define boards0   `[,species0 ,species0 ,species0])
 (define player0   (player "good guy plays well" 22 boards0 (map card->json (take all-cards 11))))
@@ -118,7 +118,7 @@
 
 (define (traits->image j*)
   (for/fold ((i empty-image)) ((t j*))
-    (above/align 'left (scale .7 (trait->img (json->trait t))) i)))
+    (above/align 'left (scale .7 (trait->img (string->trait t))) i)))
 
 (define (labeled l j)
   (text (format "~a: ~a" l j) TEXT-SIZE TEXT-COLOR))
@@ -134,7 +134,7 @@
 
 (define all-trait-images
   (local ((define traits-x-strings
-            (map (lambda (t) `(,t ,(trait->json t))) (map card-trait all-cards)))
+            (map (lambda (t) `(,t ,(trait->string t))) (map card-trait all-cards)))
           (define all-traits-img
             (for/list ((t traits-x-strings))
               (cons (first t) (text (second t) TEXT-SIZE trait-front-color))))

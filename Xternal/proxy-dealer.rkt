@@ -5,7 +5,7 @@
 
 ;; EXTERNAL SERVICES
 
-(require "../next.rkt")
+(require "next.rkt")
 
 (define dealer-external/c
   (object/c
@@ -35,12 +35,12 @@
 ;; ===================================================================================================
 ;; DEPENDENCIES
 
-(require "messaging.rkt" "../player-external.rkt" "../board.rkt" "../cards.rkt"  "../basics.rkt" json)
+(require "messaging.rkt" "player-external.rkt" "board.rkt" "cards.rkt"  "../basics.rkt" json)
 
-(require "../common.rkt")
+(require "common.rkt")
 
 (module+ test
-  (require (submod "..") "../traits.rkt" (submod "../common.rkt" test) json rackunit))
+  (require (submod "..") "../traits.rkt" (submod "common.rkt" test) json rackunit))
 
 ;; ===================================================================================================
 ;; IMPLEMENTATION
@@ -116,7 +116,8 @@
 
 ;; Next -> JSexpr
 (define (next->json n)
-  (send-message (send n to-json)))
+  (define nxt (send n to-json))
+  (send-message nxt))
 
 (module+ json-from
   (provide
