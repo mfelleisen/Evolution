@@ -6,6 +6,27 @@
 ;; -- makde thread-safe first (see global set!) then 
 ;; -- submit this for inclusion in racket.
 
+
+#|
+I wrote
+-------
+
+I am not talking about the indentation bug. I am saying comparing YOUR
+two lists next to each other suggests that there is something wrong. I
+used monospace fonts to show that one is one element longer than the
+other.
+
+Is this correct?
+
+Eli replied
+-----------
+
+Ah -- yes, it parses an escaped slash ("...\/...") on the input side but
+it doesn't generate one when it produces output.  It's some JSON oddity
+that you can escape slashes but you're not required too.  See the
+details here: http://stackoverflow.com/a/1580682/128595
+|#
+
 (provide
  ; (-> 
  ;  jsexpr?  
