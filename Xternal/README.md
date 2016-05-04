@@ -3,6 +3,8 @@
 TO DO
 -----
 
+11. update table below
+
 4. bring back gui in xmain and xserver 
 9. document JSON in this subdirectory's README 
 10. add xdist-bad-clients to test error handling 
