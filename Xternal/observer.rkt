@@ -3,8 +3,9 @@
 ;; =============================================================================
 ;; a JSON-based observer for Dealer and GUI
 
-;; EXTERNAL SERVICES
+(require "json.rkt")
 
+;; EXTERNAL SERVICES
 
 ;; dealer  = [ [iplayer_1, ..., iplayer_n], food, [card_1, ..., card_n]]
 ;; food    = natural 
@@ -18,12 +19,17 @@
 
 (define observer/c
   (object/c
-   [display (->m jsexpr? any)]))
+   [display (->m jsexpr/c any)]))
+
+(define with-observer/c
+  (object/c
+    [register-observer (->m observer/c any)]))
 
 (provide
  dealer0
  dealer->image
-
+ 
+ with-observer/c 
  observer/c)
 
 ;; ===================================================================================================

@@ -1,14 +1,16 @@
 #lang racket
 
 ;; ===================================================================================================
-;; represent a sepcies board
+;; equip species% and creators from ../ with serialization for GUI and dist. impl.
 
 ;; EXTERNAL SERVICES
 
-(define species/json/c (and/c species/c (object/c [json any/c])))
+(require "json.rkt")
+
+(define species/json/c (and/c species/c json/c))
 
 (provide
- (except-out (all-from-out "../board.rkt") create-species)
+  (except-out (all-from-out "../board.rkt") create-species)
 
  species
 

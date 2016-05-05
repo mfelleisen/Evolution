@@ -1,8 +1,7 @@
 #lang racket 
 
 ;; ===================================================================================================
-;; this file provides a debugging routine and -- from (modul test ..) functions/syntax for testing,
-;; including json testing in Xternal/
+;; this file provides json testing for serialization 
 
 ;; SERVICES
 

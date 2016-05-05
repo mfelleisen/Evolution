@@ -1,7 +1,7 @@
 #lang racket
 
 ;; ===================================================================================================
-;; representing individual cards and the set of all cards as specified in the rules of Evolution
+;; equips cards from ../ with serialization for GUI and dist. impl. 
 
 ;; EXTERNAL SERVICES
 

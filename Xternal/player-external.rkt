@@ -1,7 +1,7 @@
 #lang racket
 
 ;; ===================================================================================================
-;; the silly player -- one possible implementation of the external player
+;; overrides player-external's create-feed-* from ../ with a serializable versions of constructors 
 
 ;; EXTERNAL SERVICES
 

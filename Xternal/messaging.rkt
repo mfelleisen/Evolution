@@ -1,5 +1,10 @@
 #lang racket
 
+;; ===================================================================================================
+;; implements primitives for messaging
+
+;; TODO: merge with ./common.rkt
+
 (require (only-in json jsexpr?) racket/exn)
 
 (define LOCALHOST "127.0.0.1")
@@ -21,6 +26,7 @@
    ;; JSexpr -> Void
    ;; EFFECT send Jsexpr as bytes 
    (-> jsexpr? #t)]
+
   [read-message
    ;; -> JSexpr
    ;; Read a blob of JSON, treating any network error as EOF, and only waiting for TIMEOUT seconds.

@@ -1,7 +1,7 @@
 #lang racket
 
 ;; ===================================================================================================
-;; represent a base player and an internal from the perspective of the dealer
+;; overrides player-internal's create-species from ../ with a serializable version
 
 ;; EXTERNAL SERVICES
 
@@ -28,8 +28,4 @@
 (define player/j%
   (class player%
     (super-new
-      [create-species species]
-      [create-feed-none feed-none]
-      [create-feed-vegetarian feed-vegetarian]
-      [create-store-fat-on-tissue store-fat-on-tissue]
-      [create-feed-carnivore feed-carnivore])))
+      [create-species species])))

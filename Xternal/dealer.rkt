@@ -1,10 +1,13 @@
 #lang racket
 
 ;; ===================================================================================================
-;; this class extends the dealer from ../ for the distributed version
+;; this class extends the dealer from ../ with hooks for observations and JSON serialization, 
+;; both for playing Evolution with a GUI 
+
+(require "json.rkt")
 
 ;; the interface of the dealer for external uses (xmain, xserver, etc) 
-(define dealer/observer/c (and/c dealer/c (object/c [register-observer (->m observer/c any)])))
+(define dealer/observer/c (and/c dealer/c json/c with-observer/c))
 
 (provide
  ;; re-exports
