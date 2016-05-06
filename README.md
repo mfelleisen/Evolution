@@ -120,7 +120,7 @@ Testing
 
 Use raco to run the unit tests, e.g., 
 
-> raco test dealer.rkt 
+> raco test *.rkt 
 
 > ./xmain 8
 

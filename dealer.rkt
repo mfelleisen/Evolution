@@ -5,7 +5,7 @@
 
 ;; EXTERNAL SERVICES
 
-(require (only-in "player-internal.rkt" internal-player/c)
+(require ; (only-in "player-internal.rkt" internal-player/c)
          (only-in "next.rkt" dealer-next/c  external-player/c)
          (only-in "cards.rkt" card?)
          (only-in "basics.rkt" natural? between))
@@ -30,10 +30,10 @@
  ;; constants 
  MIN-PLAYERS
  MAX-PLAYERS
-
+ 
  create-dealer/c ;; DealerContract -> CreatorContract 
  dealer/c        ;; DealerContract 
-
+ 
  (contract-out
   [dealer%
    ;; for inheritance in xdealer
@@ -48,8 +48,8 @@
 (require (only-in "player-internal.rkt" create-player CARDS-PER-BOARD CARD-PER-PLAYER)
          (except-in "cards.rkt" card?) 
          (except-in "basics.rkt" natural? between)
-         (except-in "next.rkt" dealer-next/c)
-         "board.rkt" "traits.rkt" 2htdp/image)
+         (except-in "next.rkt" dealer-next/c external-player/c)
+         "board.rkt" "traits.rkt")
 
 ;; for debugging 
 (require "common.rkt")
@@ -95,9 +95,9 @@
      [externals
       ;; [Listof [List String Player]]
       '()])
-
+    
     (init-field
-      [internal-player create-player])
+     [internal-player create-player])
     
     (super-new)
     

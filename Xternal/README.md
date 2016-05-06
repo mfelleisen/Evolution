@@ -70,6 +70,8 @@ Compiling is optional in Racket. It reduces the start-up cost.
 Testing
 -------
 
+> raco test *.rkt 
+
 > ./xdist 8
 
 See all 1s. 
