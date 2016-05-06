@@ -33,9 +33,9 @@
 ;; ===================================================================================================
 ;; DEPENDENCIES
 
-(require
-  (except-in "../board.rkt" create-species species/c body/c fat-food/c food/c population/c traits/c)
-  (except-in "../traits.rkt" trait?))
+(require (only-in "../board.rkt" MAX-POPULATION species%)
+         (except-in "../traits.rkt" trait?)
+         "../basics.rkt")
 
 ;; for debugging
 (require  "common.rkt")
@@ -49,19 +49,13 @@
 (define (create-species/json)
   (new species/json%))
 
-(define (species #:body (body 0)
-                 #:fat-food (fat-food 0)
-                 #:food (food 0)
+(define (species #:body       (body 0)
+                 #:fat-food   (fat-food 0)
+                 #:food       (food 0)
                  #:population (population 1)
-                 #:traits (traits '()))
-  (define-syntax-rule (set food) (set-field! food s food))
+                 #:traits     (traits '()))
   (define s (new species/json%))
-  (set food)
-  (set body)
-  (set population)
-  (set traits)
-  (set fat-food)
-  s)
+  (set-fields! s food body population traits fat-food))
 
 (define (json->species j)
   (match j

@@ -24,8 +24,8 @@
 (define species/c
   (object/c
    (field
-    [food       (food/c MAX-POPULATION)]     ;; <-- weakness in contract system 
-    [fat-food   (fat-food/c MAX-BODY)] ;; <-- weakness in contract system 
+    [food       (food/c MAX-POPULATION)] ;; <-- weakness in contract system (food . < . population)
+    [fat-food   (fat-food/c MAX-BODY)]   ;; <-- weakness in contract system (fat-food . < . body)
     [body       body/c]
     [population population/c]
     [traits     (traits/c trait?)])
@@ -65,9 +65,9 @@
  MAX-TRAITS
  MIN-TRAITS
  
- species/c
- body/c
- population/c
+ species/c    ;; Contract 
+ body/c       ;; Contract
+ population/c ;; Contract
  traits/c     ;; Contract -> Contract
  food/c       ;; Contract -> Contract
  fat-food/c   ;; Contract -> Contract 
@@ -76,7 +76,7 @@
  create-species
  
  species%
-
+ 
  (contract-out
   [species
    (->i ()
@@ -114,14 +114,8 @@
                  #:food (food 0)
                  #:population (population 1)
                  #:traits (traits '()))
-  (define-syntax-rule (set food) (set-field! food s food))
   (define s (new species%))
-  (set food)
-  (set body)
-  (set population)
-  (set traits)
-  (set fat-food)
-  s)
+  (set-fields! s food body population traits fat-food))
 
 (define SPECIES-TRAITS 3)
 
@@ -157,7 +151,7 @@
     ;; this is basically nonsense 
     (define/public (equal-secondary-hash-code-of hash-code)
       (hash-code traits))
-
+    
     ;; -----------------------------------------------------------------------------
     (define/public (attackable? attacker left right)
       (cond
@@ -242,7 +236,7 @@
   ;; -------------------------------------------------------------------------------------------------
   (define (attacker1 2traits)
     (species #:body 3 #:food 2 #:population 4 #:traits `(,carnivore ,@2traits)))
-
+  
   ;; -------------------------------------------------------------------------------------------------
   ;; attackable tests
   
@@ -283,4 +277,4 @@
   (run-testing (def `(,climbing)) att-ambush-pack def-wc #f #false "defend mix w/ climbing")
   
   (run-testing (def `(,pack-hunting)) att-plain #f #f #false
-                        "defend w/ hard-shell & pack-hunting (fail the trait people)"))
+               "defend w/ hard-shell & pack-hunting (fail the trait people)"))

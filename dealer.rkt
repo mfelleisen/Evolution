@@ -81,11 +81,8 @@
                 [cards-as-set  (to-set (append dealer-cards player-cards))])
            (and cards-as-set (subset-of-all-cards? cards-as-set)))
          [r any/c #;==dealer%])
-    (define-syntax-rule (set food) (set-field! food s food))
     (define s (new dealer% [cards cards]))
-    (set players)
-    (set watering-hole)
-    s))
+    (set-fields! s players watering-hole)))
 
 ;; ---------------------------------------------------------------------------------------------------
 

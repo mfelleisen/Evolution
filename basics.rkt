@@ -146,3 +146,18 @@
 
 (define (cyclic-rotate players*)
   (append (rest players*) (list (first players*))))
+
+;; =============================================================================
+;; SYNTAX
+
+(provide
+ ;; SYNTAX (set-fields! object:expr field:id ...)
+ ;; sets field in object to field, which must exist in the local context
+ set-fields!)
+
+(define-syntax-rule
+  (set-fields! o field ...)
+  (when o
+    (set-field! field o (if (procedure? field) (field) field))
+    ...
+    o))

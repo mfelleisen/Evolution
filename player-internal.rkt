@@ -118,21 +118,9 @@
                   #:cards (cards '())
                   #:species (boards '())
                   #:external (external (lambda () #f)))
-    
-    (define-syntax-rule
-      (set s food)
-      (when s (set-field! food s (if (procedure? food) (food) food))))
-    
     (define ex (external))
-    (set ex boards)
-    (set ex bag)
-    (set ex cards)
-    
-    (define s (new player% [id name][external ex]))
-    (set s boards)
-    (set s bag)
-    (set s cards)
-    s))
+    (define s (new player% [id name][external (set-fields! ex boards bag cards)]))
+    (set-fields! s boards bag cards)))
 
 ;; ---------------------------------------------------------------------------------------------------
 ;; internal representation of a player from the dealer's perspective
@@ -420,14 +408,8 @@
   
   (define (player-nox name #:cards (cards '()) #:species (boards0 #f))
     (define boards (or boards0 (list (species))))
-    (define-syntax-rule
-      (set s food)
-      (when s (set-field! food s (if (procedure? food) (food) food))))
-    
     (define s (new player% [id name]))
-    (set s boards)
-    (set s cards)
-    s)
+    (set-fields! s boards cards))
   
   (check-false (send (player-nox 1) confirm-choice '()))
   (check-false (send (player-nox 1) confirm-choice 43))
