@@ -5,27 +5,24 @@
 
 ;; EXTERNAL SERVICES
 
-(require "next.rkt")
+(require  (only-in "../player-internal.rkt" internal-communication/c))
 
 (provide
-  create-player
-  #;
  [contract-out
   [create-player (-> any/c #;==name? any/c #;==external? internal-communication/c)]])
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
-(require "../player-internal.rkt" "board.rkt")
+(require "board.rkt" (only-in "../player-internal.rkt" player%) "../basics.rkt")
 
 ;; ===================================================================================================
 ;; IMPLEMENTATION
 
 (define (create-player name external)
   (define p (new player/j% [id name]))
-  (set-field! external p external)
-  p)
+  (set-fields! p external))
 
 (define player/j%
   (class player%
     (super-new
-      [create-species species])))
+     [create-species species])))

@@ -69,6 +69,7 @@
  CARDS-PER-BOARD
  CARD-PER-PLAYER
  
+ internal-communication/c
  internal-player/c
  player%
  
@@ -134,12 +135,12 @@
      id
      [create-species species]
      [external #false])
-
+    
     (init-field
-      [create-feed-none feed-none]
-      [create-feed-vegetarian feed-vegetarian]
-      [create-store-fat-on-tissue store-fat-on-tissue]
-      [create-feed-carnivore feed-carnivore])
+     [create-feed-none feed-none]
+     [create-feed-vegetarian feed-vegetarian]
+     [create-store-fat-on-tissue store-fat-on-tissue]
+     [create-feed-carnivore feed-carnivore])
     
     (super-new)
     
@@ -474,7 +475,7 @@
                "increase population of the default board by too much")
   (check-false (send p-simple confirm-choice (gp-existing-board 1 `[,(- cards# 1)]))
                "increase population of a new board by too much")
-
+  
   (define (gb-existing-board feed nu)
     `[0 [] ,(build-list (+ MAX-BODY 2) (lambda (i) `(,feed ,(+ i 1)))) ,nu []])
   (check-false (send p-simple confirm-choice (gb-existing-board 0 '[]))

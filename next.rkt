@@ -11,9 +11,9 @@
 
 (require (only-in "board.rkt" species/c)
          "internal-external.rkt"
-          "cards.rkt"
-          (only-in "basics.rkt" natural? natural+?)
-	  unstable/contract)
+         "cards.rkt"
+         (only-in "basics.rkt" natural? natural+?)
+         unstable/contract)
 
 ;; --- choose card actions ---
 (define action4/c any/c)
@@ -107,7 +107,7 @@
 
 (provide
  EXTINCTION-CARDS
-
+ 
  action4/c
  dealer-next/c
  internal-player/c
@@ -119,7 +119,7 @@
  feed-vegetarian%
  store-fat-on-tissue%
  feed-carnivore%
-
+ 
  (contract-out
   [one-of (-> any/c [listof next/c] boolean?)]
   
@@ -166,7 +166,7 @@
 (define feed-none%
   (class* next% (equal<%>)
     (super-new)
-
+    
     (define/public (equal-to? other r)
       (and (is-a? other feed-none%)))
     
@@ -179,7 +179,7 @@
   (class* next% (equal<%>)
     (init-field s)
     (super-new)
-
+    
     (define/public (equal-to? other r)
       (and (is-a? other feed-vegetarian%)
            (= (get-field s other) s)))
@@ -194,7 +194,7 @@
   (class* next% (equal<%>)
     (init-field s n)
     (super-new)
-
+    
     (define/public (equal-to? other r)
       (and (is-a? other store-fat-on-tissue%)
            (= (get-field s other) s)
@@ -215,7 +215,7 @@
   (class* next% (equal<%>)
     (init-field attacker p0 attackee)
     (super-new)
-
+    
     (define/public (equal-to? other r)
       (and (is-a? other feed-carnivore%)
            (= (get-field attacker other) attacker)

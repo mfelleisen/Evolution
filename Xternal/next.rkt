@@ -5,24 +5,39 @@
 
 ;; EXTERNAL SERVICES
 
-(require "json.rkt" "../basics.rkt")
+(require "json.rkt" "../basics.rkt" (only-in "../next.rkt" next/c))
 
 (define next/j/c (and/c next/c json/c))
 
 (provide
-  (all-from-out "../next.rkt")
+ (all-from-out "../next.rkt")
  (contract-out
   [feed-none           (-> next/j/c)]
   [feed-vegetarian     (-> natural? next/j/c)]
   [store-fat-on-tissue (-> natural? natural+? next/j/c)]
   [feed-carnivore      (-> natural? natural? natural? next/j/c)]))
 
+#| ---------------------------------------------------------------------------------------------------
+   uniform extension of each superclass
+                                                     ...
+                                                      |
+           +------------------------+------------------------------+-------------------+
+           |                        |                              |                   |
++----------------------+   +---------------------+   +---------------------+  +---------------------+
+| store-fat-on-tissue% |   |     feed-none%      |   |   feed-vegetarian%  |  |   feed-carnivore%   |
++----------------------+   +---------------------+   +---------------------+  +---------------------+
+           |                        |                              |                   |
++----------------------+   +---------------------+   +---------------------+  +---------------------+
+|store-fat-on-tissue/j%|   |     feed-none/j%    |   | feed-vegetarian/j%  |  |   feed-carnivore/j% |
++----------------------+   +---------------------+   +---------------------+  +---------------------+
+
+--------------------------------------------------------------------------------------------------  |#
+
 ;; ===================================================================================================
 ;; DEPENDENCIES
 
-(require (except-in "../next.rkt" feed-none feed-vegetarian store-fat-on-tissue feed-carnivore)
-         (except-in "../basics.rkt" natural? natural+?)
-	 (for-syntax racket/syntax))
+(require (except-in "../next.rkt" next/c feed-none feed-vegetarian store-fat-on-tissue feed-carnivore)
+         (for-syntax racket/syntax))
 
 ;; for debugging
 (require  "common.rkt")
@@ -43,44 +58,23 @@
   (new feed-carnivore/j% [attacker attacker][p0  p0] [attackee attackee]))
 
 ;; ---------------------------------------------------------------------------------------------------
-(define feed-none/j%
-  (class feed-none%
-    (super-new)
-    (define/public (to-json) #false)))
-
-(define feed-vegetarian/j%
-  (class feed-vegetarian%
-    (super-new)
-    (inherit-field s)
-    (define/public (to-json) s)))
-
-(define store-fat-on-tissue/j%
-  (class store-fat-on-tissue%
-    (super-new)
-    (inherit-field s n)
-    (define/public (to-json) (list s n))))
-
-(define feed-carnivore/j%
-  (class feed-carnivore%
-    (super-new)
-    (inherit-field attacker p0 attackee)
-    (define/public (to-json) (list attacker p0 attackee))))
-
-;; -----------------------------------------------------------------------------
-;; abstract with syntax 
+;; SYNTAX (define/json/c cls% (fields ...) json)
+;; creates superclass with fields ... and to-json method that delivers json
 (define-syntax (define/json/c stx)
   (syntax-case stx ()
-    [(_ feed-carnivore% (fields ...) json)
-     (let ((feed-carnivore/j% (add-/j #'feed-carnviore%)))
-       #`(define #,feed-carnivore/j%
-	   (class feed-carnivore%
-	     (super-new)
-	     (inherit-field attacker p0 attackee)
-	     (define/public (to-json) (list attacker p0 attackee)))))]))
+    [(_ cls% (fields ...) json)
+     #`(define #,(add-/j #'cls%)
+         (class cls%
+           (super-new)
+           (inherit-field fields ...)
+           (define/public (to-json) json)))]))
 
 (define-for-syntax (add-/j syntax-id)
-  (define sy (syntax-e syntax-id))
-  (define st (string->symbol sy))
-  (define -% (substring st 0 (- (string-length st) 2)))
-  (define /j (format-id "~a/j%" -%))
-  (datum->syntax syntax-id /j))
+  (define st (symbol->string (syntax-e syntax-id)))
+  (format-id syntax-id "~a/j%" (substring st 0 (- (string-length st) 1))))
+
+(define/json/c feed-none% () #false)
+(define/json/c feed-vegetarian% (s) s)
+(define/json/c store-fat-on-tissue% (s n) (list s n))
+(define/json/c feed-carnivore% (attacker p0 attackee) (list attacker p0 attackee))
+
