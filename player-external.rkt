@@ -10,8 +10,8 @@
          (only-in "basics.rkt" natural? natural+?))
 
 (provide
-  external%
-
+ external%
+ 
  (contract-out
   [create-external (-> (external-player/c pre-choose))])
  
@@ -104,13 +104,13 @@
 ;; an external player with a specific strategy
 (define external%
   (class* base-player% (equal<%>)
-
+    
     (init-field
-      [create-feed-none feed-none]
-      [create-feed-vegetarian feed-vegetarian]
-      [create-store-fat-on-tissue store-fat-on-tissue]
-      [create-feed-carnivore feed-carnivore])
-
+     [create-feed-none feed-none]
+     [create-feed-vegetarian feed-vegetarian]
+     [create-store-fat-on-tissue store-fat-on-tissue]
+     [create-feed-carnivore feed-carnivore])
+    
     (init-field
      [bad-choose
       ;; called on every call to choose; if it produces non-#f, that value is returned from choose
@@ -346,7 +346,7 @@
   ;; -------------------------------------------------------------------------------------------------
   (define (attacker1 2traits)
     (species #:body 3 #:food 2 #:population 4 #:traits `(,carnivore ,@2traits)))
-
+  
   ;; -------------------------------------------------------------------------------------------------
   (define att-plain (attacker1 '()))
   

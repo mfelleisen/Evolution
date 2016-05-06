@@ -5,9 +5,11 @@
 
 ;; EXTERNAL SERVICES
 
+(require (only-in "next.rkt" external-player/c pre-choose))
+
 (provide
-  (all-from-out "../player-external.rkt")
-    
+ (all-from-out "../player-external.rkt")
+ 
  (contract-out
   [create-external (-> (external-player/c pre-choose))])
  
@@ -21,7 +23,7 @@
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
-(require "../player-external.rkt" "next.rkt")
+(require "../player-external.rkt" (except-in "next.rkt" external-player/c pre-choose))
 
 ;; for debugging:
 (require "common.rkt")
@@ -43,7 +45,7 @@
 (define external/j%
   (class external%
     (super-new
-      [create-feed-none feed-none]
-      [create-feed-vegetarian feed-vegetarian]
-      [create-store-fat-on-tissue store-fat-on-tissue]
-      [create-feed-carnivore feed-carnivore])))
+     [create-feed-none feed-none]
+     [create-feed-vegetarian feed-vegetarian]
+     [create-store-fat-on-tissue store-fat-on-tissue]
+     [create-feed-carnivore feed-carnivore])))
