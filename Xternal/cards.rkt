@@ -3,12 +3,10 @@
 ;; ===================================================================================================
 ;; equips cards from ../ with serialization for GUI and dist. impl. 
 
-;; EXTERNAL SERVICES
-
-(require "../cards.rkt")
+;; SERVICES
 
 (provide
-  (all-from-out "../cards.rkt")
+ (all-from-out "../cards.rkt")
  
  ;; JSexpr -> Card
  json->card
@@ -19,7 +17,7 @@
 ;; ===================================================================================================
 ;; DEPENDENCIES
 
-(require "../traits.rkt")
+(require "../traits.rkt" "../cards.rkt")
 
 (module+ test
   (require rackunit))

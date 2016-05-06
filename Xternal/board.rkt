@@ -23,10 +23,10 @@
          #:population [p      population/c]
          #:traits     [t      (traits/c trait?)])
         [r species/json/c])])
-
+ 
  ;; -> Species 
  (rename-out [create-species/json create-species])
-
+ 
  ;; JSexpr -> Species 
  json->species)
 
@@ -45,8 +45,6 @@
 
 ;; ===================================================================================================
 ;; IMPLEMENTATION
-
-;; ---------------------------------------------------------------------------------------------------
 
 (define (create-species/json)
   (new species/json%))
@@ -87,7 +85,6 @@
     (inherit has)
     (inherit-field food fat-food body population traits)
     
-    ;; -----------------------------------------------------------------------------
     (define/public (to-json)
       `(("food" ,food)
         ("body" ,body)
