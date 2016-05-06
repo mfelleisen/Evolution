@@ -14,13 +14,12 @@
 (define MAX-POPULATION 7)
 (define MIN-POPULATION 0)
 
-(define trait/c any/c)
-
 (define body/c (and/c natural? (between/c MIN-BODY MAX-BODY)))
-(define (fat-food/c b) (and/c natural? #;(or (unsupplied-arg? b) (<=/c b))))
+(define (fat-food/c b) (and/c natural? (or/c (unsupplied-arg? b) (<=/c b))))
 (define (food/c p) (and/c natural? (<=/c p)))
 (define population/c (and/c natural? (between/c MIN-POPULATION MAX-POPULATION)))
-(define traits/c (and/c [listof trait?] (between MIN-TRAITS MAX-TRAITS) unique/c))
+(define (traits/c trait?)
+  (and/c [listof trait?] (between MIN-TRAITS MAX-TRAITS) unique/c))
 
 (define species/c
   (object/c
@@ -29,7 +28,7 @@
     [fat-food   (fat-food/c MAX-BODY)] ;; <-- weakness in contract system 
     [body       body/c]
     [population population/c]
-    [traits     traits/c])
+    [traits     (traits/c trait?)])
    [attackable?               any/c] ;; base
    [score                     any/c] ;; internal
    [replace-trait             any/c] ;; internal 
@@ -69,6 +68,9 @@
  species/c
  body/c
  population/c
+ traits/c     ;; Contract -> Contract
+ food/c       ;; Contract -> Contract
+ fat-food/c   ;; Contract -> Contract 
  
  ;; -> Species 
  create-species
@@ -82,7 +84,7 @@
          #:fat-food   [ff (b) (fat-food/c b)]
          #:food       [f  (p) (food/c p)]
          #:population [p      population/c]
-         #:traits     [t      traits/c])
+         #:traits     [t      (traits/c trait?)])
         [r species/c])]))
 
 ;; ===================================================================================================

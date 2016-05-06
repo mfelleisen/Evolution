@@ -88,9 +88,12 @@
   (define r (assq x *trait-x-string-representation))
   (if r (second r) (error 'trait->string "~e" x)))
 
+(module+ test
+  (check-false (string->trait "x") "bad string"))
+
 (define (string->trait j)
   (define r (argmax (lambda (x) (if (string=? (second x) j) 1 0)) *trait-x-string-representation))
-  (if r (first r) (error 'string->trait "~e" j)))
+  (if (and r (string=? (second r) j)) (first r) #false))
 
 ;; ---------------------------------------------------------------------------------------------------
 ;; specifying traits 

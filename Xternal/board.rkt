@@ -3,27 +3,39 @@
 ;; ===================================================================================================
 ;; equip species% and creators from ../ with serialization for GUI and dist. impl.
 
-;; EXTERNAL SERVICES
+;; SERVICES
 
-(require "json.rkt")
+(require "json.rkt"
+         (only-in "../board.rkt" species/c body/c fat-food/c food/c population/c traits/c)
+         (only-in "../traits.rkt" trait?))
 
 (define species/json/c (and/c species/c json/c))
 
 (provide
-  (except-out (all-from-out "../board.rkt") create-species)
-
- species
+ (all-from-out "../board.rkt")
+ 
+ (contract-out
+  [species
+   (->i ()
+        (#:body       [b      body/c]
+         #:fat-food   [ff (b) (fat-food/c b)]
+         #:food       [f  (p) (food/c p)]
+         #:population [p      population/c]
+         #:traits     [t      (traits/c trait?)])
+        [r species/json/c])])
 
  ;; -> Species 
  (rename-out [create-species/json create-species])
 
- ;; JSexpr -> Species
+ ;; JSexpr -> Species 
  json->species)
 
 ;; ===================================================================================================
 ;; DEPENDENCIES
 
-(require "../board.rkt" (except-in "../traits.rkt" trait?) "../basics.rkt")
+(require
+  (except-in "../board.rkt" create-species species/c body/c fat-food/c food/c population/c traits/c)
+  (except-in "../traits.rkt" trait?))
 
 ;; for debugging
 (require  "common.rkt")
@@ -55,37 +67,26 @@
 
 (define (json->species j)
   (match j
-    [`(("food" ,(? nat? f)) ("body" ,(? nat? b)) ("population" ,(? nat? p)) ("traits" ,(? lot? t)) . ,stuff)
+    [`(("food" ,(? (food/c MAX-POPULATION) f))
+       ("body" ,(? body/c b))
+       ("population" ,(? population/c p))
+       ("traits" ,(? (traits/c string->trait) t))
+       . ,stuff)
+     (when (> f p)
+       ;; a trick to raise a halfway appropriate exception when the food is larger than the population
+       (match `("food" ,f) ['("population" 1) #true]))
      (define ff 
        (match stuff
-	 [`(("fat-food" ,(? nat? ff))) ff]
-	 ['() 0]))
-     (define s (create-species/json))
-     (set-field! body s b)
-     (set-field! food s f)
-     (set-field! population s p)
-     (set-field! traits s (map string->trait t))
-     (set-field! fat-food s ff)
-     s]))
-
-(define (nat? x)
-  (and (natural? x) (<= 0 x 7)))
-
-;; Any -> Boolean 
-(define (lot? l)
-  (and (list? l) (<= (length l) SPECIES-TRAITS)))
-
-(define SPECIES-TRAITS 3)
-
-;; ---------------------------------------------------------------------------------------------------
-;; species% : Species
+         [`(("fat-food" ,(? (fat-food/c b) ff))) ff]
+         ['() 0]))
+     (species #:body b #:fat-food ff #:food f #:population p #:traits (map string->trait t))]))
 
 (define species/json%
   (class species%
     (super-new)
     (inherit has)
     (inherit-field food fat-food body population traits)
-
+    
     ;; -----------------------------------------------------------------------------
     (define/public (to-json)
       `(("food" ,food)
@@ -96,7 +97,7 @@
 
 ;; ===================================================================================================
 (module+ test
-  ;; -------------------------------------------------------------------------------------------------
+  
   (define (attacker1 2traits)
     (define s (create-species/json))
     (set-field! body s 3)
@@ -105,15 +106,15 @@
     (set-field! traits s `(,carnivore ,@2traits))
     s)
   
-  ;; -------------------------------------------------------------------------------------------------
   (check-equal? (json->species (send (attacker1 '()) to-json)) (attacker1 '())
                 "json->species is left-inverse for to-json")
   
   (define s0
     (let* ([s (create-species/json)])
+      (set-field! body s 2)
       (set-field! fat-food s 2)
       (set-field! traits s `(,fat-tissue))
       s))
-
+  
   (check-equal? (json->species (send s0 to-json)) s0
                 "json->species is left-inverse for to-json, with fat food"))
