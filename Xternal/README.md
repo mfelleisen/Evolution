@@ -13,10 +13,10 @@ functionality.
 TO DO
 -----
 
-12. merge common and messaging ? 
-
 4. bring back gui in xmain and xserver 
 9. document JSON in this subdirectory's README 
+12. merge common and messaging ? 
+13. document relationships between folders 
 
 Files, Modules and Dependencies 
 -------------------------------
