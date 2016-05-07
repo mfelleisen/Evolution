@@ -76,4 +76,9 @@ Testing
 
 See all 1s. 
 
+> ./xdist-bad
+
+Run 9 games with various number of good/bad players and see some bad
+players drop out. This just exercises the exception handling capabilities. 
+
 
