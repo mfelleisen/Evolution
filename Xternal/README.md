@@ -42,6 +42,7 @@ Files, Modules and Dependencies
 | proxy-json-tests  | a unit test suite for relation json-> and ->json functions	    |
 | 	      	    |									    |
 | xdist 	    | an executable for running a distributed game for n players	    |
+| xdist-bad 	    | an executable for running a distributed game for n good players, k bad ones |
 | client 	    | a client for generating dist. Evolution clients			    |
 | xclients 	    | an executable for running a bunch of clients in threads 		    |
 | xserver 	    | an executable for running server	   	      			    |
