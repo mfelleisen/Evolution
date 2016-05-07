@@ -3,10 +3,7 @@
 ;; ===================================================================================================
 ;; represent a dealer and its internal representation of a state
 
-;; EXTERNAL SERVICES
-
-(require ; (only-in "player-internal.rkt" internal-player/c)
-         (only-in "next.rkt" dealer-next/c  external-player/c)
+(require (only-in "next.rkt" dealer-next/c external-player/c)
          (only-in "cards.rkt" card?)
          (only-in "basics.rkt" natural? between))
 
@@ -35,9 +32,7 @@
  dealer/c        ;; DealerContract 
  
  (contract-out
-  [dealer%
-   ;; for inheritance in xdealer
-   dealer%/c]
+  [dealer% dealer%/c]
   
   [create-dealer
    ;; expects a list of named (string) players that satisfy the external player interface
@@ -70,20 +65,23 @@
   (new dealer% [externals players][cards cards]))
 
 (module+ test
-  (define/contract (dealer #:cards [cards '()] 
-                           #:players players
-                           #:watering [watering-hole 0])
-    (->i (#:players  [players (and/c [listof any/c #;player?] (between MIN-PLAYERS MAX-PLAYERS))])
+  ;; create a dealer set for intermediate states 
+  (define/contract (dealer #:cards [cards '()] #:players players #:watering [watering-hole 0])
+    (->i (#:players  [players (and/c [listof any/c #;==player?] (between MIN-PLAYERS MAX-PLAYERS))])
          (#:cards    [cards [listof valid-card?]]
           #:watering [watering-hole natural-number/c])
-         #:pre (cards players)
-         (let* ([player-cards  (apply append (map (lambda (p) (get-field cards p)) players))]
-                [dealer-cards  (if (unsupplied-arg? cards) '() cards)]
-                [cards-as-set  (to-set (append dealer-cards player-cards))])
-           (and cards-as-set (subset-of-all-cards? cards-as-set)))
+         #:pre (cards players) (dealer-and-player-cards-are-disjoint-sets cards players)
          [r any/c #;==dealer%])
     (define s (new dealer% [cards cards]))
-    (set-fields! s players watering-hole)))
+    (set-fields! s players watering-hole))
+
+  ; [Listof Card] [Listof InternalPlayer] -> Boolean 
+  ;; ensure that the players' and the dealer's cards are disjoint and that they form a set
+  (define (dealer-and-player-cards-are-disjoint-sets cards players)
+    [define player-cards  (apply append (map (lambda (p) (get-field cards p)) players))]
+    [define dealer-cards  (if (unsupplied-arg? cards) '() cards)]
+    [define cards-as-set  (to-set (append dealer-cards player-cards))]
+    (and cards-as-set (subset-of-all-cards? cards-as-set))))
 
 ;; ---------------------------------------------------------------------------------------------------
 
@@ -133,11 +131,9 @@
     ;; -----------------------------------------------------------------------------------------------
     ;; running a game
     
-    ;; Step4   = [Listof Action4]           ; the actions all players wish to perform 
-    ;; Results = [Listof [List Name Score]]
-    ;; Score   = N
+    ;; Results = [Listof [List N Name N]] ~~ rank, player's name, and score
     
-    ;; -> Void
+    ;; -> Results
     ;; run turns until game is over, then determine results and pretty-print them 
     (define/public (run-game)
       (let run-turns ()
@@ -146,18 +142,14 @@
           (unless (empty? players)
             (set! players (cyclic-rotate players))
             (run-turns))))
-      ;; ----------------------------------------------
-      (printf "results\n------------------------\n")
-      (for ((r (results)) (i (in-naturals)))
-        (match-define `(,id ,s) r)
-        (printf "~a player id: ~a score: ~a\n" (+ i 1) id s)))
-    
+      (results))
+      
+    ;; -> Void
+    ;; run a turn, allow derived classes to hook in a function at the top of the turn 
     (define/pubment (complete-turn)
       (inner (void) complete-turn)
       (boards-for-all)
-      (turn)
-      (when (member 'display (interface->method-names (object-interface this)))
-        (send this display)))
+      (turn))
     
     ;; -> Void
     ;; EFFECT add one board to all players that don't have one
@@ -177,7 +169,8 @@
       (define raw-scores
         (for/list ((p players))
           (list (get-field id p) (send p score))))
-      (sort raw-scores >= #:key second))
+      (for/list ((r (sort raw-scores >= #:key second)) (i (in-naturals)))
+        (cons (+ i 1) r)))
     
     ;; -> Void
     ;; EFFECT run a complete turn
@@ -212,13 +205,13 @@
       (for ((p players))
         (send p reduce-population-to-food (lambda () (give-cards-to p EXTINCTION-CARDS)))))
     
-    ;; -> Step4
+    ;; -> [Listof Action4] 
     ;; ask players to choose their actions
     ;; ASSUME (board-for-all) and (give-cards ...) replenished all players boards and cards 
     (define/private (step2-3)
       (all-players-communicate-externally (lambda (p) (send p choose players)) "choose ~e"))
     
-    ;; Step4 -> Void 
+    ;; [Listof Action4] -> Void 
     ;; execute step 4 of the Evolution turn
     ;; ASSUME: ;; (= (length players) (length card-actions))
     ;; the actions are specified in the same order as players
@@ -232,27 +225,17 @@
     (define/private (fill-up-watering-hole fc)
       (set! watering-hole (max 0 (+ watering-hole (card-food-points fc)))))
     
-    ;; -----------------------------------------------------------------------------------------------
+    ;; -> Void
     (define/public (feeding)
-      (auto-birth-fertiles)
-      (auto-feed-long-necks)
-      (auto-move-fat-food)
+      (act-on-all-from (first players) fertile? (lambda (p s) (send p population+1 s)))
+      (act-on-all-from (first players) long-neck? (lambda (p s) (feed-a-player-s-species p s)))
+      (act-on-all-from (first players) fat-tissue? (lambda (p s) (send p move-fat s)))
       ;; players* represents a cicular queue of the players that may still need food
       (let feeding ([players* players])
-        (when (and (> watering-hole 0) (cons? players*))
+        (define some-player-can-eat
+          (ormap (lambda (p) (cons? (send p feedable (players-in-order p #:last #true)))) players*))
+        (when (and (> watering-hole 0) some-player-can-eat)
           (feeding (feed1 players*)))))
-    
-    ;; -> Void
-    (define/private (auto-birth-fertiles)
-      (act-on-all-from (first players) fertile? (lambda (p s) (send p population+1 s))))
-    
-    ;; -> Void
-    (define/private (auto-feed-long-necks)
-      (act-on-all-from (first players) long-neck? (lambda (p s) (feed-a-player-s-species p s))))
-    
-    ;; -> Void
-    (define/private (auto-move-fat-food)
-      (act-on-all-from (first players) fat-tissue? (lambda (p s) (send p move-fat s))))
     
     ;; {[Listof Player]} -> [Listof Player]
     ;; players* represents a cicular queue of the players that may still need food
@@ -310,7 +293,7 @@
     (define/private (feed-if-possible player s)
       (cond
         ;; scavenging, foraging, and cooperation must not overfeed a species
-        [(or (= watering-hole 0) (send player all-fed s)) (values #f #f #f)]
+        [(or (= watering-hole 0) (send player all-fed s)) (values #false #false #false)]
         [else
          (set! watering-hole (- watering-hole 1))
          (define-values (foraging? neighbor-of-s) (send player feed1 s))
@@ -965,7 +948,10 @@
   (testing (lambda (dealer0) (send dealer0 feeding)))
   
   (log-info "testing feeding")
-  
+
+  ;; QUESTION: is there a scenario where a player must skip eating during the feeding cycle
+  ;; but eats later because something has changed that enables one of its species to attack now? 
+
   ;; -------------------------------------------------------------------------------------------------
   (check-scenario #:doc "FF no food, no feeding happens"
                   #:before
@@ -1672,7 +1658,7 @@
   (define p3 (player 3 #:bag 66))
   (define final-dealer (dealer #:players (list p1 p2 p3)))
   
-  (run-testing final-dealer '([3 66][2 58][1 37]) "end of game: score players"))
+  (run-testing final-dealer '([1 3 66][2 2 58][3 1 37]) "end of game: score players"))
 
 (module+ test
   ;; -------------------------------------------------------------------------------------------------

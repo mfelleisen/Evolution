@@ -158,7 +158,9 @@
     
     (define/public (acceptable? other) #false)
     
-    (abstract interpret)))
+    (define/pubment (interpret dealer feedable-players attackable-players)
+      (inner (cyclic-rotate feedable-players) interpret dealer feedable-players attackable-players)
+      (cyclic-rotate feedable-players))))
 
 ;; ---------------------------------------------------------------------------------------------------
 (define feed-none%
@@ -168,8 +170,7 @@
     (define/public (equal-to? other r)
       (and (is-a? other feed-none%)))
     
-    (define/override (interpret dealer feedable-players _)
-      (define current-player (first feedable-players))
+    (define/augment (interpret dealer feedable-players _attackable)
       (rest feedable-players))))
 
 ;; ---------------------------------------------------------------------------------------------------
@@ -182,10 +183,9 @@
       (and (is-a? other feed-vegetarian%)
            (= (get-field s other) s)))
     
-    (define/override (interpret dealer players* _)
+    (define/augment (interpret dealer players* _)
       (define current-player (first players*))
-      (send dealer feed-a-player-s-species current-player s)
-      (cyclic-rotate players*))))
+      (send dealer feed-a-player-s-species current-player s))))
 
 ;; ---------------------------------------------------------------------------------------------------
 (define store-fat-on-tissue%
@@ -203,10 +203,9 @@
            (= (get-field s other) s)
            (<= n (get-field n other))))
     
-    (define/override (interpret dealer feedable-players _)
+    (define/augment (interpret dealer feedable-players _)
       (define current-player (first feedable-players))
-      (send dealer store-fat current-player s n)
-      (cyclic-rotate feedable-players))))
+      (send dealer store-fat current-player s n))))
 
 ;; ---------------------------------------------------------------------------------------------------
 (define feed-carnivore%
@@ -220,7 +219,7 @@
            (= (get-field p0 other) p0)
            (= (get-field attackee other) attackee)))
     
-    (define/override (interpret dealer feedable-players attackable-players)
+    (define/augment (interpret dealer feedable-players attackable-players)
       (cond
         [(= (length attackable-players) p0) #false]
         [else 
@@ -241,8 +240,7 @@
                 (send dealer feed-scavengers current-player)])]
            [else
             (send dealer feed-a-player-s-species current-player attacker)
-            (send dealer feed-scavengers current-player)])
-         (cyclic-rotate feedable-players)]))))
+            (send dealer feed-scavengers current-player)])]))))
 
 ;; ===================================================================================================
 (module+ test

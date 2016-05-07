@@ -50,6 +50,8 @@
     [move-fat          	   any/c]
     [store-fat             any/c]
     [choose          	   any/c]
+    [next                  any/c]
+    [feedable              any/c]
     [feed-next             any/c]
     [start          	   any/c]
     [can-attack+           any/c]
@@ -197,7 +199,7 @@
         (define board (list-ref boards b))
         (send board body+1)))
     
-    (define/private (feedable players*)
+    (define/public (feedable players*)
       (define fatties (map (lambda (x) (apply create-store-fat-on-tissue x)) (with-fat-tissue)))
       (define-values (veggies0 carnivores) (separate-hungries))
       (define veggies (map create-feed-vegetarian veggies0))
@@ -254,6 +256,7 @@
     
     (define/public (next watering-hole in-attackable-order)
       (cond
+        ;; can this even happen:
         [(= watering-hole 0) (create-feed-none)]
         [else 
          (define possible-feedings (feedable in-attackable-order))
