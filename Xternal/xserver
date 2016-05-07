@@ -87,7 +87,11 @@ exec racket -W info -tm "$0" ${1+"$@"}
   (define n (length players))
   (log-info "playing a game with ~a players" n)
   (define dealer (create-dealer players))
-  (send dealer run-game)
+  (define results (send dealer run-game))
+  (printf "results\n------------------------\n")
+  (for ((r results))
+    (match-define `(,i ,id ,s) r)
+    (printf "~a player id: ~a score: ~a\n" i id s))
   (custodian-shutdown-all (current-custodian)))
 
 ;; ===================================================================================================
