@@ -38,6 +38,7 @@
   [dealer%
    ;; for inheritance in xdealer
    dealer%/c]
+  
   [create-dealer
    ;; expects a list of named (string) players that satisfy the external player interface
    (create-dealer/c dealer/c)]))
@@ -328,7 +329,7 @@
     
     ;; [Maybe X] Player FormatString [-> Y]  [X -> Y] -> Y
     ;; run (thn choice) if choice holds, otherwise (els)
-    ;; EFFECT: remove player p if (client-error? choice) holds 
+    ;; EFFECT: remove player p if choice isn't true
     (define/private (communicate-externally choice id fmt thn els)
       (cond
         [choice (thn choice)]

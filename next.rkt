@@ -10,7 +10,6 @@
 ;; EXTERNAL SERVICES
 
 (require (only-in "board.rkt" species/c)
-         "internal-external.rkt"
          "cards.rkt"
          (only-in "basics.rkt" natural? natural+?)
          unstable/contract)
@@ -89,7 +88,6 @@
    [interpret (->m dealer-next/c players/c players/c players/c)]))
 
 ;; an object contrat that describes what an external player needs to communicate with the dealer
-(define (err c) (or/c client-error? c))
 (define CARDS-BEFORE-CHOOSE 4) ;; should be (+ CARDS-PER-BOARD CARD-PER-PLAYER)
 
 (define (pre-choose external-player)
@@ -98,10 +96,10 @@
 (define boards/c [listof species/c])
 (define (external-player/c pre-choose)
   (object/c
-   [start      (->m natural? natural? boards/c [listof card?]                    [err any/c])]
+   [start      (->m natural? natural? boards/c [listof card?]                    [maybe/c any/c])]
    [choose     (->dm ([before [listof boards/c]] [after [listof boards/c]])
-                     #:pre (pre-choose this)                                     [err action4/c])]
-   [feed-next  (->m natural? boards/c [listof card?] natural+? [listof boards/c] [err next/c])]))
+                     #:pre (pre-choose this)                                     [maybe/c action4/c])]
+   [feed-next  (->m natural? boards/c [listof card?] natural+? [listof boards/c] [maybe/c next/c])]))
 
 (define EXTINCTION-CARDS 2)
 

@@ -1,0 +1,65 @@
+#! /bin/sh
+#|
+exec racket -tm "$0" ${1+"$@"}
+|#
+#lang racket
+
+;; ===================================================================================================
+;; runs a complete distrbuted game with n players on localhost port 56789, compare with
+;;   $ ./xmain n
+
+;; EXTERNAL SERVICES
+
+(require (only-in "dealer.rkt" MAX-PLAYERS MIN-PLAYERS) "../basics.rkt")
+
+(provide
+ (contract-out
+  [main
+   ;; if arg string is present, run that many good players and fill up with bad players
+   ;; otherwise run i = 0 ... MAX-PLAYERS rounds with i good players and fill up with bad players 
+   (->* []
+        [(and/c string->number (compose (between/c MIN-PLAYERS MAX-PLAYERS) string->number))]
+        any)]))
+
+;; ===================================================================================================
+;; DEPENDENCIES
+
+(require (rename-in "xserver" [main server])
+         (rename-in "xclients" [main clients]))
+
+;; ===================================================================================================
+;; IMPLEMENTATION
+
+(define (main (n-string ""))
+  (cond
+    [(string->number n-string) => run]
+    [else
+     (for ((n (in-range (+ MAX-PLAYERS 1))))
+       (run n))])
+  (exit 0))
+
+;; N -> Void
+;; run a game with good# players and (- MAX-PLAYERS good#) bad players, grab from bad-behaviors
+(define (run good#)
+  (define bad# (- MAX-PLAYERS good#))
+  (define c (make-custodian))
+  (define n-string (number->string good#))
+  (parameterize ((current-custodian c))
+    (define s (thread (lambda () (server "56789"))))
+    (define b (take bad-behaviors bad#))
+    (define b0 (string-join b ", "))
+    (displayln `(playing with ,good# good ,(if (= good# 1) 'player 'players) plus ,b0))
+    (with-output-to-string (lambda () (clients n-string b0 "localhost" "56789")))
+    (sync s))
+  (custodian-shutdown-all c))
+
+(define bad-behaviors
+  '("over"  ; bad-over-growth 
+    "no-fc" ; bad-no-fc i
+    "cinf"  ; bad-choice-inf i
+    "finf"  ; bad-feed-inf i
+    "feed"  ; bad-feed-bad i
+    "ill"   ; ill-formed
+    "infsu" ; infsu
+    "huge"  ; huge
+    "deep"))

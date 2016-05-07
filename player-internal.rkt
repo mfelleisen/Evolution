@@ -316,7 +316,7 @@
     ;; Any -> (Maybe Action4)
     (define/public (confirm-choice x)
       (match x
-        [(? client-error? x) x]
+        [(? client-error? x) #false]
         [`(,(? natural? fc)
            [,(? (NxN? 1 1) gp*) ...]
            [,(? (NxN? 1 1) gb*) ...]
