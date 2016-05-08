@@ -1,0 +1,67 @@
+
+Xternal
+
+The modules in this directory extend the modules in the super-directory: 
+ -- structural representations are equipped with serialization functions 
+ -- classes are extended with sub-classes that have serialization methods 
+ -- factory functions refer to the extended classes 
+ -- all extended modules come with deserialization functions 
+The extended modules refer to reach other so that they pick up serializable versions,
+Finally, the classes in the extended modules use the revised factory functions to override factory
+methods where appropriate. 
+
+A proxy player class implements an external player strategy that gets its "intelligence" from a
+remote client. 
+
+A client implements a remote start-up client. It consists of 
+ -- a player-external module with serialization capability for its decision-making results
+ -- a proxy-dealer module, which transparently connects the player to the server 
+ -- a client module, which combines the preceding two into an executable whole 
+
+The JSON communication layer is implemented via the common+messaging module(s), which also supports
+basic JSON testing facilities. 
+
+===================================================================================================
+
+			modules in super-directory
+
+		|           |     |        |            |     
+      +-----------------+   |     |   +------+ +-----------------+
+      | player-internal |   |     |   | next | | player-external |
+      +-----------------+   |     |   +------+ +-----------------+
+                 |1         |     |                    ^1     ^ 1
+                 |       +-------+ +-------+           |      |	
+                 |       | board | | cards |           |      |
+                 |       +-------+ +-------+           |      |
+                 |                                     |      |
+                 V1                                    |1     |
+           +--------------+               +--------------+    |
+           | proxy-player |               | proxy-dealer |    |
+           +--------------+               +--------------+    |
+            ^*   $                	          $  ^ 1      |
+            |    $                	          $  | 	      |
+            |    $      +------------------+      $  |	      |
+            |    ~~~~~~ | common+messaging | ~~~~~   |	      |
+            |           +------------------+         |	      |
+            |                                        | 1      |
+	    |				      +----------+    |
+	    |				      | x1client |----+
+	    |				      +----------+ 1
+	    |
+	    | 1 +---------+    		     
+ 	    +-- | xserver | connects to a regular dealer with n proxy players
+	        +---------+    		     
+
+===================================================================================================
+
+GUI: the dealer is equipped with JSON serialization and an observer method 
+
+       |     
+   +--------+
+   | dealer |
+   +--------+
+
+   +----------+       +-----+                         
+   | observer |       | gui | provides hooks for a GUI rendering of 
+   +----------+       +-----+ the game state via JSON serialization 
+   

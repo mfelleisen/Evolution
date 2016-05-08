@@ -24,6 +24,8 @@ Files, Modules and Dependencies
 
 | name              | purpose                                                               |
 | ----------------- | --------------------------------------------------------------------- |
+[doc-relationships](https://github.com/mfelleisen/Evolution/blob/master/Xternal/doc-relationships.txt) | what kind of objects exist and how are they related and how they interact|
+|                   |                                                                       |
 | dealer            | equip dealer with json/c and observer/c interfaces for GUI only	    |
 | player-external   | overrides feed-* creators in external% with serializable constructors |
 | player-internal   | overrides species creator in internal% with serializable constructors |
