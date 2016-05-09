@@ -43,18 +43,18 @@
    [body#                     any/c] ;; body size for attacks 
    [fat-food-needed           any/c]
    [has                       any/c]
-   [kill1 (->dm () #:pre (> (get-field population this) 0) [_ any/c])]
+   [kill1 (->i ([this any/c]) #:pre (this) (> (get-field population this) 0) [r any/c])]
    [attack!
     ;; remove 1 animal from this species population
     ;; -- signal whether this defends itself with horns 
     ;; -- signal whether this dies out due to the attack
-    (->dm () #:pre (> (get-field population this) 0) (values [horns? boolean?][dies? boolean?]))]
+    (->i ([this any/c]) #:pre (this) (> (get-field population this) 0) (values [horns? boolean?][dies? boolean?]))]
    [feed1
     ;; add 1 token of food to this species
     ;; ASSUME (< food population)
     ;; -- signal whether this species is a foraging one
     ;; -- signal whether this species is cooperating 
-    (->dm () #:pre (not (send this all-fed?)) (values [forage? boolean?] [coop? boolean?]))]))
+    (->i ([this any/c]) #:pre (this) (not (send this all-fed?)) (values [forage? boolean?] [coop? boolean?]))]))
 
 
 (provide

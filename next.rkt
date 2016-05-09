@@ -97,8 +97,8 @@
 (define (external-player/c pre-choose)
   (object/c
    [start      (->m natural? natural? boards/c [listof card?]                    [maybe/c any/c])]
-   [choose     (->dm ([before [listof boards/c]] [after [listof boards/c]])
-                     #:pre (pre-choose this)                                     [maybe/c action4/c])]
+   [choose     (->i ([this any/c] [before [listof boards/c]] [after [listof boards/c]])
+                     #:pre (this) (pre-choose this)                              [maybe/c action4/c])]
    [feed-next  (->m natural? boards/c [listof card?] natural+? [listof boards/c] [maybe/c next/c])]))
 
 (define EXTINCTION-CARDS 2)

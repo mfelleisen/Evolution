@@ -28,15 +28,15 @@
      ;; (attack! s) executes an attack on this player's board s
      ;;   signal whether the species has horns
      ;;   signal whether the species goes extinct due to attack
-     (->dm ([s natural?]) (values [horned? boolean?][gone-extinct? boolean?]))]
+     (->i ([this any/c][s natural?]) (values [horned? boolean?][gone-extinct? boolean?]))]
     
     [feed1
      ;; (feed1 s) add one token of food to this player's board s
      ;;   signal whether this board is foraging
      ;;   signal whether this board is feeding a specific neighbor s+1 or none
-     (->dm ([s natural?])
-           (values [foraging? boolean?]
-                   [neigbor-of-s [or/c #false (and/c natural? (=/c (+ s 1)))]]))]
+     (->i ([this any/c][s natural?])
+          (values [foraging? boolean?]
+                  [neigbor-of-s (s) [or/c #false (and/c natural? (=/c (+ s 1)))]]))]
     
     [population+1          any/c]
     [kill1          	   any/c]
